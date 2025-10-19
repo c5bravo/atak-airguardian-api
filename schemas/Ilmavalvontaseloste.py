@@ -1,16 +1,16 @@
 """Ilmavalvontaseloste schemas."""
 
-from typing import Optional
+from typing import Optional, Literal
 
-from pydantic import BaseModel
+from pydantic import Field, BaseModel
 
-class AirSurvellianceLog(BaseModel):
-    """Example of what the data from AirSurvelliace could look like"""
-    id: int
-    identification_number: str 
-    general_position: str
-    accurate_poisition: int(max_length=2)
-    speed: str("slow" | "fast" | "supersonic")
-    direction: int
-    altitude: str("surface" | "low" | "high")
-    details: Optional[str]
+class AirSurveillanceLog(BaseModel):
+    """Example of what the data from AirSurveillace could look like"""
+    id: int = Field(description="Source id")
+    identification_number: str = Field(description="Indentification number for the air. Str because id can start with 0")
+    general_position: str = Field(description="Two Nato-alphabethical letters")
+    accurate_poisition: str(max_length=2) = Field(description="Position defined within 10km")
+    speed: Literal("slow" | "fast" | "supersonic") = Field(description="Speed of the air unit")
+    direction: int = Field(description="Speed of the air unit")
+    altitude: Literal("surface" | "low" | "high") = Field
+    details: Optional[str] = Field(description="Additional info", default=None)
