@@ -8,8 +8,8 @@ def aircraft_log(i: int) -> AirSurveillanceLog:
     return AirSurveillanceLog(
         id=i,
         aircraft_id=f"{random.randint(10000, 99999)}",
-        general_position=random.choice(["DP52", "EQ45", "FR01", "GS85"]),
-        accurate_position=f"{random.randint(1, 99)}km",
+        general_position=random.choice(["DP", "EQ", "FR", "GS"]),
+        accurate_position=f"{random.randint(1, 99)}",
         speed=random.choice(["slow", "fast", "supersonic"]),  # lowercase
         direction=random.randint(0, 360),
         altitude=random.choice(["surface", "low", "high"]),  # lowercase
