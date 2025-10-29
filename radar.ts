@@ -50,9 +50,7 @@ export const radarRouter = new Elysia({ prefix: "/radar", name: "radar" }).get(
         return {
           id: 0,
           aircraftId: state[0],
-          approximatePosition: location.substring(0, 3),
-          generalPosition: location.substring(3, 5),
-          accuratePosition: location.substring(5),
+          position: location,
           speed,
           direction: Math.round(state[10]),
           altitude,
