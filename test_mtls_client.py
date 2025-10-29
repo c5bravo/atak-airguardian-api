@@ -2,20 +2,21 @@
 import httpx
 from app.config import settings
 
+
 def test_mtls_connection():
     """Test mTLS connection to the API"""
-    
+
     if not settings.mtls_enabled:
         print("⚠️  mTLS is not enabled in settings")
         return
-    
+
     url = f"https://{settings.api_host}:{settings.api_port}/radar/aircraft"
-    
+
     try:
         with httpx.Client(
             verify=settings.mtls_ca_cert,
             cert=(settings.mtls_client_cert, settings.mtls_client_key),
-            timeout=10.0
+            timeout=10.0,
         ) as client:
             response = client.get(url)
             response.raise_for_status()

@@ -5,7 +5,7 @@ from datetime import datetime
 
 class AircraftState(BaseModel):
     """Schema for aircraft state data from OpenSky Network API"""
-    
+
     icao24: str = Field(..., description="Unique ICAO 24-bit address")
     callsign: Optional[str] = Field(None, description="Callsign of the aircraft")
     origin_country: str = Field(..., description="Country of origin")
@@ -23,7 +23,7 @@ class AircraftState(BaseModel):
     squawk: Optional[str] = Field(None, description="Transponder code")
     spi: bool = Field(..., description="Special purpose indicator")
     position_source: int = Field(..., description="Origin of position (0=ADS-B, 1=ASTERIX, 2=MLAT)")
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -43,23 +43,19 @@ class AircraftState(BaseModel):
                 "geo_altitude": 10100.0,
                 "squawk": "1200",
                 "spi": False,
-                "position_source": 0
+                "position_source": 0,
             }
         }
 
 
 class AircraftResponse(BaseModel):
     """Response schema for filtered aircraft data"""
-    
+
     total_aircraft: int = Field(..., description="Total number of aircraft in Finland")
     timestamp: datetime = Field(..., description="Timestamp of data retrieval")
     aircraft: list[AircraftState] = Field(..., description="List of aircraft states")
-    
+
     class Config:
         json_schema_extra = {
-            "example": {
-                "total_aircraft": 5,
-                "timestamp": "2024-10-26T12:00:00",
-                "aircraft": []
-            }
+            "example": {"total_aircraft": 5, "timestamp": "2024-10-26T12:00:00", "aircraft": []}
         }

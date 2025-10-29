@@ -10,14 +10,14 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/radar", tags=["radar"])
 
+
 # Redis client with SSL support
 def create_redis_client():
     """Create Redis client with SSL if using rediss://"""
-    if settings.celery_broker_url.startswith('rediss://'):
+    if settings.celery_broker_url.startswith("rediss://"):
         ssl_context = ssl.create_default_context(cafile=settings.mtls_ca_cert)
         ssl_context.load_cert_chain(
-            certfile=settings.mtls_client_cert,
-            keyfile=settings.mtls_client_key
+            certfile=settings.mtls_client_cert, keyfile=settings.mtls_client_key
         )
         return redis.Redis(
             host=settings.redis_host,
@@ -28,17 +28,19 @@ def create_redis_client():
             ssl_cert_reqs=ssl.CERT_REQUIRED,
             ssl_ca_certs=settings.mtls_ca_cert,
             ssl_certfile=settings.mtls_client_cert,
-            ssl_keyfile=settings.mtls_client_key
+            ssl_keyfile=settings.mtls_client_key,
         )
     else:
         return redis.Redis(
             host=settings.redis_host,
             port=settings.redis_port,
             db=settings.redis_db,
-            decode_responses=True
+            decode_responses=True,
         )
 
+
 redis_client = create_redis_client()
+
 
 @router.get("/aircraft")
 def get_aircraft_data():
@@ -55,7 +57,7 @@ def get_aircraft_data():
         return {
             "aircraft_count": len(aircraft_list),
             "timestamp": timestamp,
-            "aircraft": aircraft_list
+            "aircraft": aircraft_list,
         }
     except Exception as e:
         logger.error(f"Error retrieving aircraft data: {e}")
