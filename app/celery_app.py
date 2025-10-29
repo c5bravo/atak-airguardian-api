@@ -27,6 +27,6 @@ celery_app.conf.update(
 celery_app.conf.beat_schedule = {
     "fetch-aircraft-data-every-second": {
         "task": "app.tasks.radar_task.fetch_aircraft_data",
-        "schedule": 1.0,
+        "schedule": 40.0,
     },
 }
