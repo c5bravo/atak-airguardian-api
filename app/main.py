@@ -2,14 +2,14 @@
 import ssl
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import radar_api 
+from app.api import radar_api
 from app.config import settings
 
 
 app = FastAPI(
     title="Finland Aircraft Tracker API",
     description="API to track aircraft currently flying over Finland",
-    version="1.0.0"
+    version="1.0.0",
 )
 
 # Add CORS middleware
@@ -38,7 +38,7 @@ if __name__ == "__main__":
             ssl_certfile=settings.mtls_server_cert,
             ssl_ca_certs=settings.mtls_ca_cert,
             ssl_cert_reqs=ssl.CERT_REQUIRED,
-            reload=True
+            reload=True,
         )
     else:
         print("⚠️  Starting server without mTLS")
@@ -46,5 +46,5 @@ if __name__ == "__main__":
             "app.main:app",  # Changed from "main:app"
             host=settings.api_host,
             port=settings.api_port,
-            reload=True
+            reload=True,
         )
