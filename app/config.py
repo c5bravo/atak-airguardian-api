@@ -8,6 +8,9 @@ class Settings(BaseSettings):
     redis_db: int
 
     opensky_api_url: str
+    opensky_token_url: str
+    opensky_client_id: str
+    opensky_client_secret: str
 
     finland_lat_min: float
     finland_lat_max: float
@@ -31,5 +34,6 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+
 
 settings = Settings()
