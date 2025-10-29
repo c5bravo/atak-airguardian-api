@@ -1,29 +1,49 @@
+# app/tasks/radar_task.py
 import httpx
 import redis
 import json
 import logging
+import ssl
 from typing import Optional, List, Dict
 
 from app.celery_app import celery_app
 from app.config import settings
 
-# Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Redis client
-redis_client = redis.Redis(
-    host=settings.redis_host,
-    port=settings.redis_port,
-    db=settings.redis_db,
-    decode_responses=True
-)
+# Redis client with SSL support
+def create_redis_client():
+    """Create Redis client with SSL if using rediss://"""
+    if settings.celery_broker_url.startswith('rediss://'):
+        ssl_context = ssl.create_default_context(cafile=settings.mtls_ca_cert)
+        ssl_context.load_cert_chain(
+            certfile=settings.mtls_client_cert,
+            keyfile=settings.mtls_client_key
+        )
+        return redis.Redis(
+            host=settings.redis_host,
+            port=settings.redis_port,
+            db=settings.redis_db,
+            decode_responses=True,
+            ssl=True,
+            ssl_cert_reqs=ssl.CERT_REQUIRED,
+            ssl_ca_certs=settings.mtls_ca_cert,
+            ssl_certfile=settings.mtls_client_cert,
+            ssl_keyfile=settings.mtls_client_key
+        )
+    else:
+        return redis.Redis(
+            host=settings.redis_host,
+            port=settings.redis_port,
+            db=settings.redis_db,
+            decode_responses=True
+        )
 
-# --------------------------
-# Utility functions
-# --------------------------
+redis_client = create_redis_client()
 
 def fetch_opensky_data() -> Dict:
+    """Fetch from external OpenSky API (no mTLS needed)"""
     try:
         with httpx.Client(timeout=10.0) as client:
             response = client.get(settings.opensky_api_url)
@@ -74,10 +94,6 @@ def store_in_redis(aircraft_list: List[Dict], timestamp: int):
     redis_client.set("finland_aircraft", json.dumps(aircraft_list))
     redis_client.set("last_update_time", timestamp)
     logger.info(f"Stored {len(aircraft_list)} aircraft in Redis")
-
-# --------------------------
-# Celery Task
-# --------------------------
 
 @celery_app.task(name="app.tasks.radar_task.fetch_aircraft_data")
 def fetch_aircraft_data():
