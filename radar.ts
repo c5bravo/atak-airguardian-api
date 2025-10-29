@@ -39,13 +39,13 @@ export const radarRouter = new Elysia({ prefix: "/radar", name: "radar" }).get(
     const data = await fetchOpenSkyData();
 
     const map = data.states
+      .filter((state) => !state[8])
       .map((state) => {
         const speed =
           state[9] < 140 ? "slow" : state[9] < 280 ? "fast" : "supersonic";
         const altitude =
           state[7] < 300 ? "surface" : state[7] < 3000 ? "low" : "high";
         const location = forward([state[5], state[6]], 1);
-        console.log(location);
 
         return {
           id: 0,
