@@ -38,26 +38,28 @@ export const radarRouter = new Elysia({ prefix: "/radar", name: "radar" }).get(
   async () => {
     const data = await fetchOpenSkyData();
 
-    const map = data.states.map((state) => {
-      const speed =
-        state[9] < 140 ? "slow" : state[9] < 280 ? "fast" : "supersonic";
-      const altitude =
-        state[7] < 300 ? "surface" : state[7] < 3000 ? "low" : "high";
-      const location = forward([state[5], state[6]], 1);
-      console.log(location);
+    const map = data.states
+      .map((state) => {
+        const speed =
+          state[9] < 140 ? "slow" : state[9] < 280 ? "fast" : "supersonic";
+        const altitude =
+          state[7] < 300 ? "surface" : state[7] < 3000 ? "low" : "high";
+        const location = forward([state[5], state[6]], 1);
+        console.log(location);
 
-      return {
-        id: 0,
-        aircraftId: state[0],
-        approximatePosition: location.substring(0, 3),
-        generalPosition: location.substring(3, 5),
-        accuratePosition: location.substring(5),
-        speed,
-        direction: Math.round(state[10]),
-        altitude,
-        details: state[2],
-      };
-    });
+        return {
+          id: 0,
+          aircraftId: state[0],
+          approximatePosition: location.substring(0, 3),
+          generalPosition: location.substring(3, 5),
+          accuratePosition: location.substring(5),
+          speed,
+          direction: Math.round(state[10]),
+          altitude,
+          details: state[2],
+        };
+      })
+      .toSorted((a, b) => a.aircraftId.localeCompare(b.aircraftId));
 
     return map;
   }
