@@ -6,6 +6,15 @@ __pycache__/
 # C extensions
 *.so
 
+# Ignore all cert files
+certs/
+# Or ignore just these files
+certs/*.crt
+certs/*.key
+
+# Ignore Redis persistence file
+dump.rdb
+
 # Distribution / packaging
 .Python
 build/
