@@ -11,6 +11,7 @@ certs/
 # Or ignore just these files
 certs/*.crt
 certs/*.key
+credentials.json
 
 # Ignore Redis persistence file
 dump.rdb
