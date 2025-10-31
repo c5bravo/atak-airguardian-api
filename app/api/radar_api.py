@@ -71,8 +71,8 @@ def convert_to_mgrs(longitude: Optional[float], latitude: Optional[float]) -> Op
         latitude: Latitude in decimal degrees
 
     Returns:
-        MGRS string in format "35V-MH-23" or None
-        Example: MGRS "35VMH2625532571" -> "35V-MH-26"
+        MGRS string in format "35VMH23" or None
+        Example: MGRS "35VMH2625532571" -> "35VMH26"
     """
     if longitude is None or latitude is None:
         return None
@@ -105,7 +105,7 @@ def convert_to_mgrs(longitude: Optional[float], latitude: Optional[float]) -> Op
                 precision = "00"
 
             # Format as "GridZone-SquareID-Precision"
-            return f"{grid_zone}-{square_id}-{precision}"
+            return f"{grid_zone}{square_id}{precision}"
 
         return None
     except Exception as e:
@@ -148,9 +148,9 @@ def transform_aircraft(aircraft: Dict) -> Dict:
         "time_position": convert_timestamp_to_datetime(aircraft.get("time_position")),
         "last_contact": convert_timestamp_to_datetime(aircraft.get("last_contact")),
         "position": convert_to_mgrs(aircraft.get("longitude"), aircraft.get("latitude")),
-        "Korkeus": classify_altitude(aircraft.get("baro_altitude")),
-        "Nopeus": classify_speed(aircraft.get("velocity")),
-        "Suunta": aircraft.get("true_track"),
+        "altitude": classify_altitude(aircraft.get("baro_altitude")),
+        "velocity": classify_speed(aircraft.get("velocity")),
+        "track": aircraft.get("true_track"),
         "on_ground": aircraft.get("on_ground"),
     }
 
