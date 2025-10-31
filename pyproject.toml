@@ -2,7 +2,7 @@
 name = "test-radar"
 version = "0.1.0"
 description = "Finland Aircraft Tracker API with mTLS support"
-authors = [{ name = "Your Name", email = "you@example.com" }]
+authors = [{ name = "Eagle" }]
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -11,9 +11,10 @@ dependencies = [
     "fastapi>=0.120.0,<0.121.0",
     "uvicorn>=0.38.0,<0.39.0",
     "python-dotenv>=1.2.1,<2.0.0",
-    "httpx>=0.28.1,<0.29.0",            # Already includes mTLS support
+    "httpx>=0.28.1,<0.29.0",
     "requests>=2.32.5,<3.0.0",
     "pydantic-settings>=2.11.0,<3.0.0",
+    "mgrs>=1.4.6,<2.0.0",
 ]
 
 [dependency-groups]

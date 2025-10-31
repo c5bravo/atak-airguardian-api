@@ -489,6 +489,53 @@ yaml = ["PyYAML (>=3.10)"]
 zookeeper = ["kazoo (>=2.8.0)"]
 
 [[package]]
+name = "mgrs"
+version = "1.5.0"
+description = "MGRS coordinate conversion for Python"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "mgrs-1.5.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:785e50655360fc14de732591d53479144c2b980bb1f1d8e3130969e7bda28ff2"},
+    {file = "mgrs-1.5.0-cp310-cp310-manylinux_2_12_i686.manylinux2010_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:bfa656b865224552c738486629a117f76e20ab0e309d87fa8c94a4f96b8bf555"},
+    {file = "mgrs-1.5.0-cp310-cp310-manylinux_2_12_x86_64.manylinux2010_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:06c02a5d5bf8b0e58bedd9f216bc3cc63b49db5b302f3982a5f8f80d2d4c60de"},
+    {file = "mgrs-1.5.0-cp310-cp310-musllinux_1_2_i686.whl", hash = "sha256:137296c2df8fdfdfcaa6e21d81a27da5451846bca7460862072908f804639431"},
+    {file = "mgrs-1.5.0-cp310-cp310-musllinux_1_2_x86_64.whl", hash = "sha256:42a47c3feed7cac9dcdf5fcc6066a77a878c30083e75acbfb5566cf446441d99"},
+    {file = "mgrs-1.5.0-cp310-cp310-win32.whl", hash = "sha256:4f60fb1bad0923215a3156d9b833dcd5eeeb64e3309513159f0ab2d7829c1068"},
+    {file = "mgrs-1.5.0-cp310-cp310-win_amd64.whl", hash = "sha256:f78c7e5014e5cae6c5513221a299379306561de432ff7373c0aee2a4ed90b560"},
+    {file = "mgrs-1.5.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:8f29e88b7fb458c2d574dd1f771347e6ec5bd548ca8a5aeab1b1a39cb93b25f6"},
+    {file = "mgrs-1.5.0-cp311-cp311-manylinux_2_12_i686.manylinux2010_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:73e175cd4795bc08309a33499294c85cdae2f2e86e7fbe2b79ea5fc7e6663e87"},
+    {file = "mgrs-1.5.0-cp311-cp311-manylinux_2_12_x86_64.manylinux2010_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:805455e5475681074125381381035434929fec27abdeeb2ff633e5feb41ce1f1"},
+    {file = "mgrs-1.5.0-cp311-cp311-musllinux_1_2_i686.whl", hash = "sha256:9364a70e067ad1c346fe02094007ba9077d2b53672922251de243268e6cc54a4"},
+    {file = "mgrs-1.5.0-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:9416e237680877fa79e71fa7ed98e3de412320dcc17590d241bfff21d4db952f"},
+    {file = "mgrs-1.5.0-cp311-cp311-win32.whl", hash = "sha256:b0a9a2ef778e9477647f154d40b5c2a0f723061a12a349ddb30cb9c20f153108"},
+    {file = "mgrs-1.5.0-cp311-cp311-win_amd64.whl", hash = "sha256:7904c2c454cf5afbe2fa11e898d3881625e817c66fe24dfdf098a9153cda4023"},
+    {file = "mgrs-1.5.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:3171ae9581238bbb5467e4dc85dfb0299ae17085e3a196640615e20ddb6a24c8"},
+    {file = "mgrs-1.5.0-cp312-cp312-manylinux_2_12_i686.manylinux2010_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:89d67dbdc337bc4ca5f212bc5cdf3be754862a2310c552fc13cc4cce264bfbff"},
+    {file = "mgrs-1.5.0-cp312-cp312-manylinux_2_12_x86_64.manylinux2010_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:40c0193c57fccdc4031f69fe65803767e3d25e99e28199fdd893ea939e301be6"},
+    {file = "mgrs-1.5.0-cp312-cp312-musllinux_1_2_i686.whl", hash = "sha256:b6fea82cc17069ab866e93abbf37913a0044a66e0d21255f06862b2feaa248fd"},
+    {file = "mgrs-1.5.0-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:36021894edff1c53f8775b299b4b29e20fe79365a2ace8d42f90c49f5c2c9e81"},
+    {file = "mgrs-1.5.0-cp312-cp312-win32.whl", hash = "sha256:749b019e5f3cc40a4a642e8937bdb0c85c30ceb9c5ca11dc98e40b6854c780f1"},
+    {file = "mgrs-1.5.0-cp312-cp312-win_amd64.whl", hash = "sha256:134343e425204c3503f7d71a79ade41ef09baa9537a5eac54ed9124df0b567f1"},
+    {file = "mgrs-1.5.0-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:fd9d00933464ab69316df4266c19564e95f9681334ebcd71d45ad915c6bd70de"},
+    {file = "mgrs-1.5.0-cp39-cp39-manylinux_2_12_i686.manylinux2010_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:c923d4efc6e8003338727b4f35956879e7511fdb481634bd5a311dc5b4bc31c4"},
+    {file = "mgrs-1.5.0-cp39-cp39-manylinux_2_12_x86_64.manylinux2010_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a4664a4e14f2edc7273108e547aa74048adde6f3264b350be503b7936d35e9f2"},
+    {file = "mgrs-1.5.0-cp39-cp39-musllinux_1_2_i686.whl", hash = "sha256:bf7c82229b95a9be034bf21a946db51c1764354763a308fdd425c5d57f9a2c8a"},
+    {file = "mgrs-1.5.0-cp39-cp39-musllinux_1_2_x86_64.whl", hash = "sha256:dea082e783b2c3dfbf933b44f15ac9d6937343c83345ef57bd83bd3d28a3093b"},
+    {file = "mgrs-1.5.0-cp39-cp39-win32.whl", hash = "sha256:375946a1c233ef63a2a35caeed3128c37c3820f803341063931193f2bf77d40a"},
+    {file = "mgrs-1.5.0-cp39-cp39-win_amd64.whl", hash = "sha256:22d075cf819e56add1be240774399da29ab51d1b2a636290b0e980890ae3922e"},
+    {file = "mgrs-1.5.0-pp310-pypy310_pp73-macosx_11_0_arm64.whl", hash = "sha256:d40c9f5d95fc14796444dba16a6dbb74ec61d22d9689d2cdc003b33a589bd355"},
+    {file = "mgrs-1.5.0-pp310-pypy310_pp73-manylinux_2_12_i686.manylinux2010_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:3be147a68dd0b45f0afb8b8425515028e8576a3c9089ba38f2f3f669f7e10a0d"},
+    {file = "mgrs-1.5.0-pp310-pypy310_pp73-manylinux_2_12_x86_64.manylinux2010_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ed6a47f008ddbc24743de3cd507a7cd6a31c582552c89c807854e6c2fa55e0a8"},
+    {file = "mgrs-1.5.0-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:0aceeed9b1f321e081c790c3263b383688bd0a7ad4e2e79312d3438af1209bbd"},
+    {file = "mgrs-1.5.0-pp39-pypy39_pp73-macosx_11_0_arm64.whl", hash = "sha256:d71fe869340f5aafabbdff525683794658017f664c6edd1677920ca44f58583b"},
+    {file = "mgrs-1.5.0-pp39-pypy39_pp73-manylinux_2_12_i686.manylinux2010_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:1f969797a86c3bbd9348305611ec2c6c30ea98af5fdcab0d39a1989cd595f6ab"},
+    {file = "mgrs-1.5.0-pp39-pypy39_pp73-manylinux_2_12_x86_64.manylinux2010_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4026069d39ffc6953cc970b4992c25e18983e1a24db512a644518a757c5a87b4"},
+    {file = "mgrs-1.5.0-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:ca1f34f5f40e94bea8d30fb0f97d50ecc02fa86761f07e2402d257f71e9e65cc"},
+    {file = "mgrs-1.5.0.tar.gz", hash = "sha256:bff4f7e806ed29d46f8a31a01e6e0e6629e1eca425f745d39af639260bbc89c6"},
+]
+
+[[package]]
 name = "packaging"
 version = "25.0"
 description = "Core utilities for Python packages"
@@ -1010,4 +1057,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12"
-content-hash = "5f79a5beed3faa08ab9754eece988a2ee5482b3e8215189e761ed403ea45a779"
+content-hash = "6714d8fb73752b19e8d3d67806afdf19c51144e333eb873ef38a75be734944c2"

@@ -54,7 +54,7 @@ def fetch_opensky_data() -> Dict:
         with httpx.Client(timeout=10.0) as client:
             response = client.get(settings.opensky_api_url, headers=auth_headers)
             response.raise_for_status()
-            logger.info(f"Successfully fetched data from OpenSky API")
+            logger.info("Successfully fetched data from OpenSky API")
             return response.json()
 
     except httpx.HTTPError as e:
