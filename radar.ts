@@ -1,3 +1,4 @@
+import { env } from "bun";
 import { Elysia } from "elysia";
 import { forward } from "mgrs";
 type State = [
@@ -26,17 +27,51 @@ type Response = {
   states: Array<State>;
 };
 
-async function fetchOpenSkyData() {
+async function fetchOpenSkyData(token: string) {
   const resp = await fetch(
-    "https://opensky-network.org/api/states/all?lamin=59.5&lamax=70.0&lomin=19.5&lomax=31.5"
+    "https://opensky-network.org/api/states/all?lamin=59.5&lamax=70.0&lomin=19.5&lomax=31.5",
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
   );
   return (await resp.json()) as Response;
 }
 
-export const radarRouter = new Elysia({ prefix: "/radar", name: "radar" }).get(
-  "/aircraft",
-  async () => {
-    const data = await fetchOpenSkyData();
+async function fetchToken() {
+  const response = await fetch(
+    "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token",
+    {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        grant_type: "client_credentials",
+        client_id: env.OPENSKY_CLIENT_ID!,
+        client_secret: env.OPENSKY_CLIENT_SECRET!,
+      }),
+    }
+  );
+  const data = (await response.json()) as {
+    access_token: string;
+    expires_in: number;
+  };
+  return {
+    access_token: data.access_token,
+    expires_on: new Date().getTime() + data.expires_in,
+  };
+}
+
+export const radarRouter = new Elysia({ prefix: "/radar", name: "radar" })
+  .state("auth", { access_token: "", expires_on: 0 })
+  .get("/aircraft", async ({ store }) => {
+    if (store.auth.expires_on < new Date().getTime()) {
+      const auth = await fetchToken();
+      store.auth.access_token = auth.access_token;
+      store.auth.expires_on = auth.expires_on;
+    }
+
+    const data = await fetchOpenSkyData(store.auth.access_token);
 
     const map = data.states
       .filter((state) => !state[8])
@@ -60,5 +95,4 @@ export const radarRouter = new Elysia({ prefix: "/radar", name: "radar" }).get(
       .toSorted((a, b) => a.aircraftId.localeCompare(b.aircraftId));
 
     return map;
-  }
-);
+  });
