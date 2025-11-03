@@ -21,10 +21,6 @@ mgrs_converter = mgrs.MGRS()
 def create_redis_client():
     """Create Redis client with SSL if using rediss://"""
     if settings.celery_broker_url.startswith("rediss://"):
-        ssl_context = ssl.create_default_context(cafile=settings.mtls_ca_cert)
-        ssl_context.load_cert_chain(
-            certfile=settings.mtls_client_cert, keyfile=settings.mtls_client_key
-        )
         return redis.Redis(
             host=settings.redis_host,
             port=settings.redis_port,
@@ -35,6 +31,7 @@ def create_redis_client():
             ssl_ca_certs=settings.mtls_ca_cert,
             ssl_certfile=settings.mtls_client_cert,
             ssl_keyfile=settings.mtls_client_key,
+            ssl_check_hostname=False,  # Disable hostname verification for Docker network
         )
     else:
         return redis.Redis(
