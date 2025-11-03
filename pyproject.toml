@@ -1,31 +1,30 @@
-[project]
+[tool.poetry]
 name = "test-radar"
 version = "0.1.0"
 description = "Finland Aircraft Tracker API with mTLS support"
-authors = [{ name = "Eagle" }]
+authors = ["Eagle <eagle@example.com>"]
 readme = "README.md"
-requires-python = ">=3.12"
-dependencies = [
-    "celery>=5.5.3,<6.0.0",
-    "redis>=7.0.0,<8.0.0",
-    "fastapi>=0.120.0,<0.121.0",
-    "uvicorn>=0.38.0,<0.39.0",
-    "python-dotenv>=1.2.1,<2.0.0",
-    "httpx>=0.28.1,<0.29.0",
-    "requests>=2.32.5,<3.0.0",
-    "pydantic-settings>=2.11.0,<3.0.0",
-    "mgrs>=1.4.6,<2.0.0",
-]
 
-[dependency-groups]
-dev = ["pytest>=7.4.0", "pytest-asyncio>=0.21.0", "ruff (>=0.14.2,<0.15.0)"]
+[tool.poetry.dependencies]
+python = "^3.12"
+celery = "^5.5.3"
+redis = "^7.0.0"
+fastapi = "^0.120.0"
+uvicorn = "^0.38.0"
+python-dotenv = "^1.2.1"
+httpx = "^0.28.1"
+requests = "^2.32.5"
+pydantic-settings = "^2.11.0"
+mgrs = "^1.4.6"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+pytest-asyncio = "^0.21.0"
+ruff = "^0.14.2"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry]
-package-mode = false
 
 [tool.ruff]
 line-length = 100
