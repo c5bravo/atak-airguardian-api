@@ -81,11 +81,11 @@ def classify_altitude(altitude: Optional[float]) -> Optional[str]:
         return None
 
     if altitude < 300:
-        return "pinnassa"
+        return "surface"
     elif altitude < 3000:
-        return "matalalla"
+        return "low"
     else:
-        return "korkealla"
+        return "high"
 
 
 def classify_speed(velocity: Optional[float]) -> Optional[str]:
@@ -94,11 +94,11 @@ def classify_speed(velocity: Optional[float]) -> Optional[str]:
         return None
 
     if velocity < 140:
-        return "hidas"
+        return "slow"
     elif velocity < 280:
-        return "nopea"
+        return "fast"
     else:
-        return "erittäin nopea"
+        return "super sonic"
 
 
 def transform_aircraft(aircraft: Dict) -> Dict:
