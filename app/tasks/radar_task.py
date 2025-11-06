@@ -3,7 +3,6 @@ import httpx
 import redis
 import json
 import logging
-import ssl
 from typing import Optional, List, Dict
 
 from app.celery_app import celery_app
@@ -13,30 +12,20 @@ from app.opensky_auth import opensky_auth
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# ✅ Optional: Enable OpenSky multi-key rotation mode
+# Comment out this line if you want to always use one key from .env
+opensky_auth.enable_multi_key_mode(True)
 
-# Redis client with SSL support
+
+# Redis client (no SSL)
 def create_redis_client():
-    """Create Redis client with SSL if using rediss://"""
-    if settings.celery_broker_url.startswith("rediss://"):
-        return redis.Redis(
-            host=settings.redis_host,
-            port=settings.redis_port,
-            db=settings.redis_db,
-            decode_responses=True,
-            ssl=True,
-            ssl_cert_reqs=ssl.CERT_REQUIRED,
-            ssl_ca_certs=settings.mtls_ca_cert,
-            ssl_certfile=settings.mtls_client_cert,
-            ssl_keyfile=settings.mtls_client_key,
-            ssl_check_hostname=False,  # Disable hostname verification for Docker network
-        )
-    else:
-        return redis.Redis(
-            host=settings.redis_host,
-            port=settings.redis_port,
-            db=settings.redis_db,
-            decode_responses=True,
-        )
+    """Create Redis client"""
+    return redis.Redis(
+        host=settings.redis_host,
+        port=settings.redis_port,
+        db=settings.redis_db,
+        decode_responses=True,
+    )
 
 
 redis_client = create_redis_client()
@@ -65,6 +54,7 @@ def fetch_opensky_data() -> Dict:
 
 
 def is_in_finland(latitude: Optional[float], longitude: Optional[float]) -> bool:
+    """Check if coordinates are inside Finland"""
     if latitude is None or longitude is None:
         return False
     return (
@@ -74,6 +64,7 @@ def is_in_finland(latitude: Optional[float], longitude: Optional[float]) -> bool
 
 
 def filter_aircraft_in_finland(states: List[List]) -> List[Dict]:
+    """Filter aircraft states to include only those over Finland"""
     filtered = []
     for state in states:
         lat, lon = state[6], state[5]
@@ -83,6 +74,7 @@ def filter_aircraft_in_finland(states: List[List]) -> List[Dict]:
 
 
 def extract_required_fields(states: List[List]) -> List[Dict]:
+    """Extract only the relevant aircraft fields from API states"""
     aircraft_list = []
     for state in states:
         aircraft_list.append(
@@ -104,6 +96,7 @@ def extract_required_fields(states: List[List]) -> List[Dict]:
 
 
 def store_in_redis(aircraft_list: List[Dict], timestamp: int):
+    """Store aircraft data and timestamp in Redis"""
     redis_client.set("finland_aircraft", json.dumps(aircraft_list))
     redis_client.set("last_update_time", timestamp)
     logger.info(f"📦 Stored {len(aircraft_list)} aircraft in Redis")
@@ -111,6 +104,7 @@ def store_in_redis(aircraft_list: List[Dict], timestamp: int):
 
 @celery_app.task(name="app.tasks.radar_task.fetch_aircraft_data")
 def fetch_aircraft_data():
+    """Main Celery task: Fetch aircraft data and store filtered results in Redis"""
     logger.info("🚀 Starting fetch_aircraft_data task...")
     data = fetch_opensky_data()
 
