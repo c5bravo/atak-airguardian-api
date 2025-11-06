@@ -4,28 +4,41 @@ from typing import Optional
 
 
 class Settings(BaseSettings):
+    # Redis Configuration
     redis_host: str
     redis_port: int
     redis_db: int
 
+    # OpenSky API Configuration
     opensky_api_url: str
     opensky_token_url: str
     opensky_client_id: str
     opensky_client_secret: str
 
+    # Optional additional OpenSky API credentials (for multi-key rotation)
+    opensky_client_id_1: Optional[str] = None
+    opensky_client_secret_1: Optional[str] = None
+    opensky_client_id_2: Optional[str] = None
+    opensky_client_secret_2: Optional[str] = None
+    opensky_client_id_3: Optional[str] = None
+    opensky_client_secret_3: Optional[str] = None
+
+    # Finland Bounding Box
     finland_lat_min: float
     finland_lat_max: float
     finland_lon_min: float
     finland_lon_max: float
 
+    # API Server Configuration
     api_host: str
     api_port: int
 
+    # Celery Configuration
     celery_broker_url: str
     celery_result_backend: str
 
-    # mTLS settings
-    mtls_enabled: bool = False
+    # mTLS Configuration
+    mtls_enabled: bool
     mtls_ca_cert: Optional[str] = None
     mtls_server_cert: Optional[str] = None
     mtls_server_key: Optional[str] = None
