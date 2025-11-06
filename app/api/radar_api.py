@@ -4,7 +4,6 @@ import redis
 import json
 from app.config import settings
 import logging
-import ssl
 from datetime import datetime
 from typing import Dict, Optional
 import mgrs
@@ -17,38 +16,22 @@ router = APIRouter(prefix="/radar", tags=["radar"])
 mgrs_converter = mgrs.MGRS()
 
 
-# Redis client with SSL support
+# Redis client (no SSL)
 def create_redis_client():
-    """Create Redis client with SSL if using rediss://"""
-    if settings.celery_broker_url.startswith("rediss://"):
-        return redis.Redis(
-            host=settings.redis_host,
-            port=settings.redis_port,
-            db=settings.redis_db,
-            decode_responses=True,
-            ssl=True,
-            ssl_cert_reqs=ssl.CERT_REQUIRED,
-            ssl_ca_certs=settings.mtls_ca_cert,
-            ssl_certfile=settings.mtls_client_cert,
-            ssl_keyfile=settings.mtls_client_key,
-            ssl_check_hostname=False,  # Disable hostname verification for Docker network
-        )
-    else:
-        return redis.Redis(
-            host=settings.redis_host,
-            port=settings.redis_port,
-            db=settings.redis_db,
-            decode_responses=True,
-        )
+    """Create Redis client"""
+    return redis.Redis(
+        host=settings.redis_host,
+        port=settings.redis_port,
+        db=settings.redis_db,
+        decode_responses=True,
+    )
 
 
 redis_client = create_redis_client()
 
 
 def convert_timestamp_to_datetime(timestamp: Optional[int]) -> Optional[str]:
-    """
-    Convert Unix timestamp to dd.mm.yyyy hh:mm:ss format.
-    """
+    """Convert Unix timestamp to dd.mm.yyyy hh:mm:ss format"""
     if timestamp is None:
         return None
     try:
@@ -60,48 +43,30 @@ def convert_timestamp_to_datetime(timestamp: Optional[int]) -> Optional[str]:
 
 
 def convert_to_mgrs(longitude: Optional[float], latitude: Optional[float]) -> Optional[str]:
-    """
-    Convert longitude/latitude to MGRS format.
-
-    Args:
-        longitude: Longitude in decimal degrees
-        latitude: Latitude in decimal degrees
-
-    Returns:
-        MGRS string in format "35VMH23" or None
-        Example: MGRS "35VMH2625532571" -> "35VMH26"
-    """
+    """Convert longitude/latitude to MGRS format"""
     if longitude is None or latitude is None:
         return None
 
     try:
-        # Convert to MGRS string with precision 5 (10m precision)
-        # Example output: "35VMH2625532571"
         mgrs_string = mgrs_converter.toMGRS(latitude, longitude, MGRSPrecision=5)
 
         if len(mgrs_string) >= 5:
-            # Extract grid zone (3 or 4 characters)
             if len(mgrs_string) > 2 and mgrs_string[2].isdigit():
-                # 4-character grid zone (e.g., "31UBQ")
                 grid_zone = mgrs_string[:4]
                 square_id = mgrs_string[4:6]
                 rest = mgrs_string[6:]
             else:
-                # 3-character grid zone (e.g., "35VMH")
                 grid_zone = mgrs_string[:3]
                 square_id = mgrs_string[3:5]
                 rest = mgrs_string[5:]
 
-            # Get first 2 digits of easting (first half of remaining digits)
             if len(rest) > 0:
                 mid = len(rest) // 2
                 easting = rest[:mid]
-                # Take first 2 digits of easting
                 precision = easting[:2] if len(easting) >= 2 else easting.ljust(2, "0")
             else:
                 precision = "00"
 
-            # Format as "GridZone-SquareID-Precision"
             return f"{grid_zone}{square_id}{precision}"
 
         return None
@@ -111,6 +76,7 @@ def convert_to_mgrs(longitude: Optional[float], latitude: Optional[float]) -> Op
 
 
 def classify_altitude(altitude: Optional[float]) -> Optional[str]:
+    """Classify altitude in meters"""
     if altitude is None:
         return None
 
@@ -123,6 +89,7 @@ def classify_altitude(altitude: Optional[float]) -> Optional[str]:
 
 
 def classify_speed(velocity: Optional[float]) -> Optional[str]:
+    """Classify speed in m/s"""
     if velocity is None:
         return None
 
@@ -135,9 +102,7 @@ def classify_speed(velocity: Optional[float]) -> Optional[str]:
 
 
 def transform_aircraft(aircraft: Dict) -> Dict:
-    """
-    Transform a single aircraft object to the new format.
-    """
+    """Transform a single aircraft object to the new format"""
     transformed = {
         "icao24": aircraft.get("icao24"),
         "callsign": aircraft.get("callsign"),
@@ -156,6 +121,7 @@ def transform_aircraft(aircraft: Dict) -> Dict:
 
 @router.get("/aircraft")
 def get_aircraft_data():
+    """Retrieve aircraft data in Finland from Redis"""
     try:
         aircraft_json = redis_client.get("finland_aircraft")
         last_update_time = redis_client.get("last_update_time")
@@ -178,9 +144,7 @@ def get_aircraft_data():
 
 @router.get("/aircraft/raw")
 def get_raw_aircraft_data():
-    """
-    Retrieve raw aircraft data in Finland from Redis without transformation.
-    """
+    """Retrieve raw aircraft data in Finland from Redis without transformation"""
     try:
         aircraft_json = redis_client.get("finland_aircraft")
         last_update_time = redis_client.get("last_update_time")
