@@ -1,5 +1,5 @@
 import { env } from "bun";
-import { Elysia } from "elysia";
+import { Elysia, status } from "elysia";
 import { forward } from "mgrs";
 type State = [
   string, // icao24
@@ -36,6 +36,13 @@ async function fetchOpenSkyData(token: string) {
       },
     }
   );
+  console.log(resp.headers.get("x-rate-limit-remaining"));
+  if (!resp.ok) {
+    console.log(resp.headers.get("x-rate-limit-retry-after-seconds"));
+
+    return resp.status;
+  }
+
   return (await resp.json()) as Response;
 }
 
@@ -65,34 +72,42 @@ async function fetchToken() {
 export const radarRouter = new Elysia({ prefix: "/radar", name: "radar" })
   .state("auth", { access_token: "", expires_on: 0 })
   .get("/aircraft", async ({ store }) => {
-    if (store.auth.expires_on < new Date().getTime()) {
-      const auth = await fetchToken();
-      store.auth.access_token = auth.access_token;
-      store.auth.expires_on = auth.expires_on;
+    try {
+      if (store.auth.expires_on < new Date().getTime()) {
+        const auth = await fetchToken();
+        store.auth.access_token = auth.access_token;
+        store.auth.expires_on = auth.expires_on;
+      }
+
+      const data = await fetchOpenSkyData(store.auth.access_token);
+      if (typeof data === "number") {
+        return status(data);
+      }
+
+      const map = data.states
+        .filter((state) => !state[8])
+        .map((state) => {
+          const speed =
+            state[9] < 140 ? "slow" : state[9] < 280 ? "fast" : "supersonic";
+          const altitude =
+            state[7] < 300 ? "surface" : state[7] < 3000 ? "low" : "high";
+          const location = forward([state[5], state[6]], 1);
+
+          return {
+            id: 0,
+            aircraftId: state[0],
+            position: location,
+            speed,
+            direction: Math.round(state[10]),
+            altitude,
+            details: state[2],
+          };
+        })
+        .toSorted((a, b) => a.aircraftId.localeCompare(b.aircraftId));
+
+      return map;
+    } catch (e) {
+      console.error(e);
+      return status(500);
     }
-
-    const data = await fetchOpenSkyData(store.auth.access_token);
-
-    const map = data.states
-      .filter((state) => !state[8])
-      .map((state) => {
-        const speed =
-          state[9] < 140 ? "slow" : state[9] < 280 ? "fast" : "supersonic";
-        const altitude =
-          state[7] < 300 ? "surface" : state[7] < 3000 ? "low" : "high";
-        const location = forward([state[5], state[6]], 1);
-
-        return {
-          id: 0,
-          aircraftId: state[0],
-          position: location,
-          speed,
-          direction: Math.round(state[10]),
-          altitude,
-          details: state[2],
-        };
-      })
-      .toSorted((a, b) => a.aircraftId.localeCompare(b.aircraftId));
-
-    return map;
   });
