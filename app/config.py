@@ -12,8 +12,19 @@ class Settings(BaseSettings):
     # OpenSky API Configuration
     opensky_api_url: str
     opensky_token_url: str
-    opensky_client_id: str
-    opensky_client_secret: str
+    # Default/single key (fallback)
+    opensky_client_id: Optional[str] = None
+    opensky_client_secret: Optional[str] = None
+
+    # Multi-key support
+    opensky_client_id_1: Optional[str] = None
+    opensky_client_secret_1: Optional[str] = None
+
+    opensky_client_id_2: Optional[str] = None
+    opensky_client_secret_2: Optional[str] = None
+
+    opensky_client_id_3: Optional[str] = None
+    opensky_client_secret_3: Optional[str] = None
 
     # Optional additional OpenSky API credentials (for multi-key rotation)
     opensky_client_id_1: Optional[str] = None
