@@ -12,10 +12,6 @@ from app.opensky_auth import opensky_auth
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# ✅ Optional: Enable OpenSky multi-key rotation mode
-# Comment out this line if you want to always use one key from .env
-opensky_auth.enable_multi_key_mode(True)
-
 
 # Redis client (no SSL)
 def create_redis_client():
@@ -31,26 +27,80 @@ def create_redis_client():
 redis_client = create_redis_client()
 
 
+def build_opensky_url() -> str:
+    """Build OpenSky API URL with bounding box for Finland
+
+    This saves API credits by only fetching data for Finland
+    Area: ~400,000 sq km = 4 credits per request
+    """
+    base_url = settings.opensky_api_url
+
+    # Add bounding box parameters
+    url = (
+        f"{base_url}?"
+        f"lamin={settings.finland_lat_min}&"
+        f"lamax={settings.finland_lat_max}&"
+        f"lomin={settings.finland_lon_min}&"
+        f"lomax={settings.finland_lon_max}"
+    )
+
+    logger.info(
+        f"🗺️  Using bounding box: Finland ({settings.finland_lat_min}°N to {settings.finland_lat_max}°N)"
+    )
+    return url
+
+
 def fetch_opensky_data() -> Dict:
-    """Fetch from OpenSky API with OAuth2 authentication"""
-    try:
-        auth_headers = opensky_auth.get_auth_headers()
+    """Fetch from OpenSky API with OAuth2 authentication
 
-        with httpx.Client(timeout=10.0) as client:
-            response = client.get(settings.opensky_api_url, headers=auth_headers)
-            response.raise_for_status()
-            logger.info("✅ Successfully fetched data from OpenSky API")
-            return response.json()
+    Retries with all available API keys on 429 rate limit
+    Uses bounding box to save credits
+    """
+    max_retries = len(opensky_auth.api_keys)
+    attempt = 0
 
-    except httpx.HTTPError as e:
-        logger.error(f"❌ HTTP error occurred: {e}")
-        if hasattr(e, "response") and e.response is not None:
-            logger.error(f"Response status: {e.response.status_code}")
-            logger.error(f"Response body: {e.response.text}")
-        return {}
-    except Exception as e:
-        logger.error(f"❌ Unexpected error fetching OpenSky data: {e}")
-        return {}
+    # Build URL with Finland bounding box
+    api_url = build_opensky_url()
+
+    while attempt < max_retries:
+        try:
+            attempt += 1
+            key_info = opensky_auth.get_current_key_info()
+            logger.info(
+                f"📍 Attempt {attempt}/{max_retries} using key {key_info['key_index']} of {key_info['total_keys']}"
+            )
+
+            auth_headers = opensky_auth.get_auth_headers()
+
+            with httpx.Client(timeout=10.0) as client:
+                response = client.get(api_url, headers=auth_headers)
+
+                # Check for rate limit (HTTP 429)
+                if response.status_code == 429:
+                    logger.warning(
+                        f"⚠️  Rate limit 429 on key {key_info['key_index']}! Trying next key..."
+                    )
+                    opensky_auth.rotate_key()
+                    continue  # Try next key
+
+                response.raise_for_status()
+                logger.info("✅ Successfully fetched data from OpenSky API")
+                return response.json()
+
+        except httpx.HTTPError as e:
+            if "429" in str(e):
+                logger.warning(f"⚠️  HTTP 429 error on attempt {attempt}! Rotating key...")
+                opensky_auth.rotate_key()
+                continue
+            else:
+                logger.error(f"❌ HTTP error occurred: {e}")
+                return {}
+        except Exception as e:
+            logger.error(f"❌ Unexpected error fetching OpenSky data: {e}")
+            return {}
+
+    logger.error(f"❌ All {max_retries} API keys exhausted - still getting 429!")
+    return {}
 
 
 def is_in_finland(latitude: Optional[float], longitude: Optional[float]) -> bool:
