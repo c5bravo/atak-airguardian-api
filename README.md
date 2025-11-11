@@ -37,17 +37,20 @@ cd atak-airguardian-api
 ```
 
 ## 2. Configure environment
+```bash
 cp .env.example .env.docker
 nano .env.docker
-# Add your OpenSky credentials:
-# OPENSKY_CLIENT_ID=your-client-id
-# OPENSKY_CLIENT_SECRET=your-client-secret
+```
+### Add your OpenSky credentials:
+### OPENSKY_CLIENT_ID=your-client-id
+### OPENSKY_CLIENT_SECRET=your-client-secret
+
 
 ## 3. Poetry install
 ```bash
 curl -sSL https://install.python-poetry.org/ | python3 -
-or
 ```
+or
 ```bash
 echo 'export PATH="/home/user/.local/bin:$PATH"' >> ~/.zshrc
 ```
@@ -81,12 +84,12 @@ docker compose restart celery-worker
 ```
 
 ## 6. Test
+```bash
 curl --cacert certs/ca.crt \
      --cert certs/client.crt \
      --key certs/client.key \
      https://localhost:8002/radar/aircraft
-
----
+```
 
 ## 💻 Local Development - Poetry
 
