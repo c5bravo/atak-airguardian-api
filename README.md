@@ -41,9 +41,9 @@ cd atak-airguardian-api
 cp .env.example .env.docker
 nano .env.docker
 ```
-### Add your OpenSky credentials:
-### OPENSKY_CLIENT_ID=your-client-id
-### OPENSKY_CLIENT_SECRET=your-client-secret
+#### 2.1 Add your OpenSky credentials:
+#### 2.2 OPENSKY_CLIENT_ID=your-client-id
+#### 2.3 OPENSKY_CLIENT_SECRET=your-client-secret
 
 
 ## 3. Poetry install
