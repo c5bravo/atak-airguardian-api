@@ -1,34 +1,20 @@
-# Dockerfile
-# Stage 1: Builder - Install dependencies with Poetry
-FROM python:3.12-slim AS builder
-
-WORKDIR /app
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Poetry
-RUN pip install --no-cache-dir poetry==1.7.1
-
-COPY pyproject.toml ./
-
-RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
-
-# Stage 2: Runtime - Use requirements.txt
 FROM python:3.12-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
-    openssl \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
+    libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /app/requirements.txt .
+COPY pyproject.toml poetry.lock ./
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir poetry==1.7.1
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-root --no-interaction --no-ansi
+
+RUN pip install --no-cache-dir celery
 
 COPY app ./app
 
