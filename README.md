@@ -30,52 +30,61 @@ OpenSky API → Celery Worker → Filter Finland → Transform to MGRS → Redis
 
 ### Installation
 
+## 1. Clone repository
 ```bash
-# 1. Clone repository
 git clone <repo-url>
 cd atak-airguardian-api
+```
 
-# 2. Install Docker (Ubuntu/Debian)
-chmod +x install_docker_ubuntu.sh
-./install_docker_ubuntu.sh
-# Log out and back in
-
-# 3. Configure environment
+## 2. Configure environment
 cp .env.example .env.docker
 nano .env.docker
 # Add your OpenSky credentials:
 # OPENSKY_CLIENT_ID=your-client-id
 # OPENSKY_CLIENT_SECRET=your-client-secret
 
-# 4. Generate certificates
-chmod +x setup.sh
+## 3. Poetry install
+```bash
+curl -sSL https://install.python-poetry.org/ | python3 -
+or
+```
+```bash
+echo 'export PATH="/home/user/.local/bin:$PATH"' >> ~/.zshrc
+```
+
+```bash
+poetry install
+poetry lock
+```
+
+## 4. Generate certificates
+```bash
 ./setup.sh
+```
 
-# 5. Start services
+
+
+## 5. Start services
+### Rebuild
+```bash
 docker compose up -d --build
+```
 
-# 6. Test
+### Stop services
+```bash
+docker compose down
+```
+
+### Restart service
+```bash
+docker compose restart celery-worker
+```
+
+## 6. Test
 curl --cacert certs/ca.crt \
      --cert certs/client.crt \
      --key certs/client.key \
      https://localhost:8002/radar/aircraft
-```
-
-### Docker Commands
-
-```bash
-# View logs
-docker compose logs -f
-
-# Stop services
-docker compose down
-
-# Restart service
-docker compose restart celery-worker
-
-# Rebuild
-docker compose up -d --build
-```
 
 ---
 
@@ -232,43 +241,37 @@ curl --cacert certs/ca.crt \
 ### Required Environment Variables
 
 ```bash
-#####################################
-# 🚀 Redis Configuration
+# Redis Configuration
 #####################################
 REDIS_HOST=your_redis_host
 REDIS_PORT=your_redis_port
 REDIS_DB=your_redis_db
 
-#####################################
-# ⚙️ Celery Configuration
+# Celery Configuration
 #####################################
 CELERY_BROKER_URL=your_celery_broker_url
 CELERY_RESULT_BACKEND=your_celery_result_backend
 
-#####################################
-# ✈️ OpenSky API Configuration
+# OpenSky API Configuration
 #####################################
 OPENSKY_API_URL=your_opensky_api_url
 OPENSKY_TOKEN_URL=your_opensky_token_url
 OPENSKY_CLIENT_ID=your_opensky_client_id
 OPENSKY_CLIENT_SECRET=your_opensky_client_secret
 
+# Finland Bounding Box
 #####################################
-# 🇫🇮 Finland Bounding Box
-#####################################
-FINLAND_LAT_MIN=your_lat_min
-FINLAND_LAT_MAX=your_lat_max
-FINLAND_LON_MIN=your_lon_min
-FINLAND_LON_MAX=your_lon_max
+FINLAND_LAT_MIN=59.5
+FINLAND_LAT_MAX=70.0
+FINLAND_LON_MIN=19.5
+FINLAND_LON_MAX=31.5
 
-#####################################
-# 🌐 API Server Configuration
+# API Server Configuration
 #####################################
 API_HOST=your_api_host
 API_PORT=your_api_port
 
-#####################################
-# 🔐 mTLS Configuration
+# mTLS Configuration
 #####################################
 MTLS_ENABLED=your_mtls_enabled
 MTLS_CA_CERT=your_mtls_ca_cert_path
@@ -327,7 +330,7 @@ docker compose logs celery-worker
 rm -rf certs
 ./setup.sh
 docker compose down
-docker compose up -d --build
+docker compose up --build
 ```
 
 ### Redis Connection Issues
