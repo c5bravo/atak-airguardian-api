@@ -1,4 +1,3 @@
-# app/api/radar_api.py
 from fastapi import APIRouter
 import redis
 import json
@@ -43,36 +42,34 @@ def convert_timestamp_to_datetime(timestamp: Optional[int]) -> Optional[str]:
 
 
 def convert_to_mgrs(longitude: Optional[float], latitude: Optional[float]) -> Optional[str]:
-    """Convert longitude/latitude to MGRS format"""
+    """Convert longitude/latitude to full-precision MGRS format"""
     if longitude is None or latitude is None:
         return None
 
     try:
         mgrs_string = mgrs_converter.toMGRS(latitude, longitude, MGRSPrecision=5)
-
-        if len(mgrs_string) >= 5:
-            if len(mgrs_string) > 2 and mgrs_string[2].isdigit():
-                grid_zone = mgrs_string[:4]
-                square_id = mgrs_string[4:6]
-                rest = mgrs_string[6:]
-            else:
-                grid_zone = mgrs_string[:3]
-                square_id = mgrs_string[3:5]
-                rest = mgrs_string[5:]
-
-            if len(rest) > 0:
-                mid = len(rest) // 2
-                easting = rest[:mid]
-                precision = easting[:2] if len(easting) >= 2 else easting.ljust(2, "0")
-            else:
-                precision = "00"
-
-            return f"{grid_zone}{square_id}{precision}"
-
-        return None
+        return mgrs_string.strip().replace(" ", "")
     except Exception as e:
         logger.error(f"Error converting coordinates ({latitude}, {longitude}) to MGRS: {e}")
         return None
+
+
+def shorten_mgrs(mgrs_full: str) -> str:
+    """Return a readable shortened MGRS (auto-adjust precision)."""
+    if not mgrs_full or len(mgrs_full) < 5:
+        return mgrs_full
+
+    grid_zone = mgrs_full[:5]  # e.g. "36WVT"
+    rest = mgrs_full[5:]
+
+    mid = len(rest) // 2
+    easting = rest[:mid]
+    northing = rest[mid:]
+
+    # Use up to 2–3 digits from each, depending on what exists
+    digits_to_use = min(1, len(easting), len(northing))
+    short = f"{grid_zone}{easting[:digits_to_use]}{northing[:digits_to_use]}"
+    return short
 
 
 def classify_altitude(altitude: Optional[float]) -> Optional[str]:
@@ -103,13 +100,15 @@ def classify_speed(velocity: Optional[float]) -> Optional[str]:
 
 def transform_aircraft(aircraft: Dict) -> Dict:
     """Transform a single aircraft object to the new format"""
+    full_mgrs = convert_to_mgrs(aircraft.get("longitude"), aircraft.get("latitude"))
+
     transformed = {
         "icao24": aircraft.get("icao24"),
         "callsign": aircraft.get("callsign"),
         "origin_country": aircraft.get("origin_country"),
         "time_position": convert_timestamp_to_datetime(aircraft.get("time_position")),
         "last_contact": convert_timestamp_to_datetime(aircraft.get("last_contact")),
-        "position": convert_to_mgrs(aircraft.get("longitude"), aircraft.get("latitude")),
+        "position": shorten_mgrs(full_mgrs),
         "altitude": classify_altitude(aircraft.get("baro_altitude")),
         "velocity": classify_speed(aircraft.get("velocity")),
         "track": aircraft.get("true_track"),
