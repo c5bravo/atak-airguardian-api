@@ -1,18 +1,11 @@
-# app/main.py
 import ssl
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import radar_api
 from app.config import settings
 
+app = FastAPI()
 
-app = FastAPI(
-    title="Finland Aircraft Tracker API",
-    description="API to track aircraft currently flying over Finland",
-    version="1.0.0",
-)
-
-# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -21,7 +14,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-##### Include routers #####
 app.include_router(radar_api.router)
 
 
@@ -31,7 +23,7 @@ if __name__ == "__main__":
     if settings.mtls_enabled:
         print("🔒 Starting server with mTLS enabled")
         uvicorn.run(
-            "app.main:app",  # Changed from "main:app"
+            "app.main:app",
             host=settings.api_host,
             port=settings.api_port,
             ssl_keyfile=settings.mtls_server_key,
@@ -43,7 +35,7 @@ if __name__ == "__main__":
     else:
         print("⚠️  Starting server without mTLS")
         uvicorn.run(
-            "app.main:app",  # Changed from "main:app"
+            "app.main:app",
             host=settings.api_host,
             port=settings.api_port,
             reload=True,

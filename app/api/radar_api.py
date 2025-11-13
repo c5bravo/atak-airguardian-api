@@ -47,7 +47,7 @@ def convert_to_mgrs(longitude: Optional[float], latitude: Optional[float]) -> Op
         return None
 
     try:
-        mgrs_string = mgrs_converter.toMGRS(latitude, longitude, MGRSPrecision=5)
+        mgrs_string = mgrs_converter.toMGRS(latitude, longitude)
         return mgrs_string.strip().replace(" ", "")
     except Exception as e:
         logger.error(f"Error converting coordinates ({latitude}, {longitude}) to MGRS: {e}")
@@ -66,9 +66,7 @@ def shorten_mgrs(mgrs_full: str) -> str:
     easting = rest[:mid]
     northing = rest[mid:]
 
-    # Use up to 2–3 digits from each, depending on what exists
-    digits_to_use = min(1, len(easting), len(northing))
-    short = f"{grid_zone}{easting[:digits_to_use]}{northing[:digits_to_use]}"
+    short = f"{grid_zone}{easting[1]}{northing[1]}"
     return short
 
 
@@ -105,14 +103,17 @@ def transform_aircraft(aircraft: Dict) -> Dict:
     transformed = {
         "icao24": aircraft.get("icao24"),
         "callsign": aircraft.get("callsign"),
-        "origin_country": aircraft.get("origin_country"),
-        "time_position": convert_timestamp_to_datetime(aircraft.get("time_position")),
-        "last_contact": convert_timestamp_to_datetime(aircraft.get("last_contact")),
+        "origin country": aircraft.get("origin_country"),
+        "time position": convert_timestamp_to_datetime(aircraft.get("time_position")),
+        "last contact": convert_timestamp_to_datetime(aircraft.get("last_contact")),
         "position": shorten_mgrs(full_mgrs),
         "altitude": classify_altitude(aircraft.get("baro_altitude")),
+        "on ground": aircraft.get("on_ground"),
         "velocity": classify_speed(aircraft.get("velocity")),
         "track": aircraft.get("true_track"),
-        "on_ground": aircraft.get("on_ground"),
+        "vertical rate": aircraft.get("vertical_rate"),
+        "squawk": aircraft.get("squawk"),
+        "position source": aircraft.get("position_source"),
     }
 
     return transformed
