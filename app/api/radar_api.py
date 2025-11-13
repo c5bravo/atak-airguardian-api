@@ -96,6 +96,10 @@ def classify_speed(velocity: Optional[float]) -> Optional[str]:
         return "super sonic"
 
 
+def more_details(aircraft: Optional[Dict]) -> Optional[str]:
+    return f"This aircraft[{aircraft.get('callsign')}] from [{aircraft.get('origin_country')}] and it is civilian aircraft."
+
+
 def transform_aircraft(aircraft: Dict) -> Dict:
     """Transform a single aircraft object to the new format"""
     full_mgrs = convert_to_mgrs(aircraft.get("longitude"), aircraft.get("latitude"))
@@ -114,6 +118,7 @@ def transform_aircraft(aircraft: Dict) -> Dict:
         "vertical rate": aircraft.get("vertical_rate"),
         "squawk": aircraft.get("squawk"),
         "position source": aircraft.get("position_source"),
+        "more details": more_details(aircraft),
     }
 
     return transformed
