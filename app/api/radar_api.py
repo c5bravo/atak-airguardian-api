@@ -107,17 +107,17 @@ def transform_aircraft(aircraft: Dict) -> Dict:
     transformed = {
         "icao24": aircraft.get("icao24"),
         "callsign": aircraft.get("callsign"),
-        "origin country": aircraft.get("origin_country"),
-        "time position": convert_timestamp_to_datetime(aircraft.get("time_position")),
-        "last contact": convert_timestamp_to_datetime(aircraft.get("last_contact")),
+        "origin_country": aircraft.get("origin_country"),
+        "time_position": convert_timestamp_to_datetime(aircraft.get("time_position")),
+        "last_contact": convert_timestamp_to_datetime(aircraft.get("last_contact")),
         "position": shorten_mgrs(full_mgrs),
         "altitude": classify_altitude(aircraft.get("baro_altitude")),
-        "on ground": aircraft.get("on_ground"),
+        "on_ground": aircraft.get("on_ground"),
         "velocity": classify_speed(aircraft.get("velocity")),
         "track": aircraft.get("true_track"),
-        "vertical rate": aircraft.get("vertical_rate"),
+        "vertical_rate": aircraft.get("vertical_rate"),
         "squawk": aircraft.get("squawk"),
-        "position source": aircraft.get("position_source"),
+        "position_source": aircraft.get("position_source"),
         "details": more_details(aircraft),
     }
 
