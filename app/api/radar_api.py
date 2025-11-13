@@ -118,7 +118,7 @@ def transform_aircraft(aircraft: Dict) -> Dict:
         "vertical rate": aircraft.get("vertical_rate"),
         "squawk": aircraft.get("squawk"),
         "position source": aircraft.get("position_source"),
-        "more details": more_details(aircraft),
+        "details": more_details(aircraft),
     }
 
     return transformed
