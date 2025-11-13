@@ -1,7 +1,6 @@
 from celery import Celery
 from app.config import settings
 
-# Create Celery app
 celery_app = Celery(
     "aircraft_tracker",
     broker=settings.celery_broker_url,
@@ -9,7 +8,6 @@ celery_app = Celery(
     include=["app.tasks.radar_task"],
 )
 
-# Celery configuration
 celery_app.conf.update(
     task_serializer="json",
     accept_content=["json"],
@@ -23,7 +21,6 @@ celery_app.conf.update(
     worker_max_tasks_per_child=1000,
 )
 
-# Beat schedule for periodic tasks
 celery_app.conf.beat_schedule = {
     "fetch-aircraft-data-every-second": {
         "task": "app.tasks.radar_task.fetch_aircraft_data",

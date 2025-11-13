@@ -1,4 +1,3 @@
-# app/tasks/radar_task.py
 import httpx
 import redis
 import json
@@ -13,7 +12,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-# Redis client (no SSL)
 def create_redis_client():
     """Create Redis client"""
     return redis.Redis(
@@ -45,7 +43,7 @@ def build_opensky_url() -> str:
     )
 
     logger.info(
-        f"🗺️  Using bounding box: Finland ({settings.finland_lat_min}°N to {settings.finland_lat_max}°N)"
+        f"Using bounding box: Finland ({settings.finland_lat_min}°N to {settings.finland_lat_max}°N)"
     )
     return url
 
@@ -59,7 +57,6 @@ def fetch_opensky_data() -> Dict:
     max_retries = len(opensky_auth.api_keys)
     attempt = 0
 
-    # Build URL with Finland bounding box
     api_url = build_opensky_url()
 
     while attempt < max_retries:
@@ -137,9 +134,12 @@ def extract_required_fields(states: List[List]) -> List[Dict]:
                 "longitude": state[5],
                 "latitude": state[6],
                 "baro_altitude": state[7],
+                "on_ground": state[8],
                 "velocity": state[9],
                 "true_track": state[10],
-                "on_ground": state[8],
+                "vertical rate": state[11],
+                "squawk": state[14],
+                "position source": state[16],
             }
         )
     return aircraft_list

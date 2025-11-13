@@ -1,4 +1,3 @@
-# app/config.py
 from pydantic_settings import BaseSettings
 from typing import Optional
 
@@ -23,14 +22,6 @@ class Settings(BaseSettings):
     opensky_client_id_2: Optional[str] = None
     opensky_client_secret_2: Optional[str] = None
 
-    opensky_client_id_3: Optional[str] = None
-    opensky_client_secret_3: Optional[str] = None
-
-    # Optional additional OpenSky API credentials (for multi-key rotation)
-    opensky_client_id_1: Optional[str] = None
-    opensky_client_secret_1: Optional[str] = None
-    opensky_client_id_2: Optional[str] = None
-    opensky_client_secret_2: Optional[str] = None
     opensky_client_id_3: Optional[str] = None
     opensky_client_secret_3: Optional[str] = None
 
