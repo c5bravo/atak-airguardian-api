@@ -1,23 +1,21 @@
 from fastapi import APIRouter
 import redis
+from redis.client import Redis
 import json
 from app.config import settings
 import logging
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 import mgrs
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/radar", tags=["radar"])
 
-# Initialize MGRS converter
 mgrs_converter = mgrs.MGRS()
 
 
-# Redis client (no SSL)
-def create_redis_client():
-    """Create Redis client"""
+def create_redis_client() -> Redis:
     return redis.Redis(
         host=settings.redis_host,
         port=settings.redis_port,
@@ -50,7 +48,7 @@ def convert_to_mgrs(longitude: Optional[float], latitude: Optional[float]) -> Op
         mgrs_string = mgrs_converter.toMGRS(latitude, longitude)
         return mgrs_string.strip().replace(" ", "")
     except Exception as e:
-        logger.error(f"Error converting coordinates ({latitude}, {longitude}) to MGRS: {e}")
+        logger.error(f"Error converting coordinates ({latitude}, {longitude}) to MGRS: {e}!!!")
         return None
 
 
@@ -96,8 +94,10 @@ def classify_speed(velocity: Optional[float]) -> Optional[str]:
         return "super sonic"
 
 
-def more_details(aircraft: Optional[Dict]) -> Optional[str]:
-    return f"This aircraft[{aircraft.get('callsign')}] from [{aircraft.get('origin_country')}] and it is civilian aircraft."
+def more_details(aircraft: Dict[str, Any]) -> str:
+    callsign = aircraft.get("callsign", "unknown")
+    country = aircraft.get("origin_country", "unknown")
+    return f"This aircraft[{callsign}] from [{country}] is a civilian aircraft."
 
 
 def transform_aircraft(aircraft: Dict) -> Dict:
@@ -110,14 +110,11 @@ def transform_aircraft(aircraft: Dict) -> Dict:
         "origin_country": aircraft.get("origin_country"),
         "time_position": convert_timestamp_to_datetime(aircraft.get("time_position")),
         "last_contact": convert_timestamp_to_datetime(aircraft.get("last_contact")),
-        "position": shorten_mgrs(full_mgrs),
+        "position": shorten_mgrs(str(full_mgrs)),
         "altitude": classify_altitude(aircraft.get("baro_altitude")),
-        "on_ground": aircraft.get("on_ground"),
         "velocity": classify_speed(aircraft.get("velocity")),
         "track": aircraft.get("true_track"),
-        "vertical_rate": aircraft.get("vertical_rate"),
-        "squawk": aircraft.get("squawk"),
-        "position_source": aircraft.get("position_source"),
+        "on_ground": aircraft.get("on_ground"),
         "details": more_details(aircraft),
     }
 
@@ -129,18 +126,24 @@ def get_aircraft_data():
     """Retrieve aircraft data in Finland from Redis"""
     try:
         aircraft_json = redis_client.get("finland_aircraft")
+        generater_aircraft_json = redis_client.get("generater_aircraft")
         last_update_time = redis_client.get("last_update_time")
 
-        aircraft_list = json.loads(aircraft_json) if aircraft_json else []
+        aircraft_list = json.loads(str(aircraft_json)) if aircraft_json else []
+        generater_aircraft_json = (
+            json.loads(str(generater_aircraft_json)) if generater_aircraft_json else []
+        )
+
         timestamp = int(last_update_time) if last_update_time else 0
 
         # Transform each aircraft
         transformed_aircraft = [transform_aircraft(aircraft) for aircraft in aircraft_list]
+        combined_airckraft_list = transformed_aircraft + generater_aircraft_json
 
         return {
-            "aircraft_count": len(transformed_aircraft),
+            "aircraft_count": len(combined_airckraft_list),
             "timestamp": convert_timestamp_to_datetime(timestamp),
-            "aircraft": transformed_aircraft,
+            "aircraft": combined_airckraft_list,
         }
     except Exception as e:
         logger.error(f"Error retrieving aircraft data: {e}")
@@ -154,8 +157,8 @@ def get_raw_aircraft_data():
         aircraft_json = redis_client.get("finland_aircraft")
         last_update_time = redis_client.get("last_update_time")
 
-        aircraft_list = json.loads(aircraft_json) if aircraft_json else []
-        timestamp = int(last_update_time) if last_update_time else 0
+        aircraft_list = json.loads(str(aircraft_json)) if aircraft_json else []
+        timestamp = last_update_time if last_update_time else 0
 
         return {
             "aircraft_count": len(aircraft_list),
