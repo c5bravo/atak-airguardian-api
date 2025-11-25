@@ -26,14 +26,12 @@ redis_client = create_redis_client()
 
 
 def build_opensky_url() -> str:
-    """Build OpenSky API URL with bounding box for Finland
-
-    This saves API credits by only fetching data for Finland
+    """
+    Build OpenSky API URL with bounding box for Finland
     Area: ~400,000 sq km = 4 credits per request
     """
     base_url = settings.opensky_api_url
 
-    # Add bounding box parameters
     url = (
         f"{base_url}?"
         f"lamin={settings.finland_lat_min}&"
@@ -62,21 +60,13 @@ def fetch_opensky_data() -> Dict:
     while attempt < max_retries:
         try:
             attempt += 1
-            key_info = opensky_auth.get_current_key_info()
-            logger.info(
-                f"📍 Attempt {attempt}/{max_retries} using key {key_info['key_index']} of {key_info['total_keys']}"
-            )
 
             auth_headers = opensky_auth.get_auth_headers()
 
             with httpx.Client(timeout=10.0) as client:
                 response = client.get(api_url, headers=auth_headers)
 
-                # Check for rate limit (HTTP 429)
                 if response.status_code == 429:
-                    logger.warning(
-                        f"⚠️  Rate limit 429 on key {key_info['key_index']}! Trying next key..."
-                    )
                     opensky_auth.rotate_key()
                     continue  # Try next key
 
@@ -86,17 +76,17 @@ def fetch_opensky_data() -> Dict:
 
         except httpx.HTTPError as e:
             if "429" in str(e):
-                logger.warning(f"⚠️  HTTP 429 error on attempt {attempt}! Rotating key...")
+                logger.warning(f"HTTP 429 error on attempt {attempt}! Rotating key...")
                 opensky_auth.rotate_key()
                 continue
             else:
-                logger.error(f"❌ HTTP error occurred: {e}")
+                logger.error(f"HTTP error occurred: {e}")
                 return {}
         except Exception as e:
-            logger.error(f"❌ Unexpected error fetching OpenSky data: {e}")
+            logger.error(f"Unexpected error fetching OpenSky data: {e}")
             return {}
 
-    logger.error(f"❌ All {max_retries} API keys exhausted - still getting 429!")
+    logger.error(f"All {max_retries} API keys exhausted - still getting 429!")
     return {}
 
 
@@ -120,12 +110,13 @@ def filter_aircraft_in_finland(states: List[List]) -> List[Dict]:
     return filtered
 
 
-def extract_required_fields(states: List[List]) -> List[Dict]:
+def extract_required_fields(states: List[Dict]) -> List[Dict]:
     """Extract only the relevant aircraft fields from API states"""
     aircraft_list = []
     for state in states:
         aircraft_list.append(
             {
+                "open_sky": True,
                 "icao24": state[0],
                 "callsign": state[1].strip() if state[1] else None,
                 "origin_country": state[2],
@@ -137,9 +128,6 @@ def extract_required_fields(states: List[List]) -> List[Dict]:
                 "on_ground": state[8],
                 "velocity": state[9],
                 "true_track": state[10],
-                "vertical rate": state[11],
-                "squawk": state[14],
-                "position source": state[16],
             }
         )
     return aircraft_list
@@ -149,17 +137,17 @@ def store_in_redis(aircraft_list: List[Dict], timestamp: int):
     """Store aircraft data and timestamp in Redis"""
     redis_client.set("finland_aircraft", json.dumps(aircraft_list))
     redis_client.set("last_update_time", timestamp)
-    logger.info(f"📦 Stored {len(aircraft_list)} aircraft in Redis")
+    logger.info(f"Stored {len(aircraft_list)} aircraft in Redis.")
 
 
 @celery_app.task(name="app.tasks.radar_task.fetch_aircraft_data")
 def fetch_aircraft_data():
     """Main Celery task: Fetch aircraft data and store filtered results in Redis"""
-    logger.info("🚀 Starting fetch_aircraft_data task...")
+    logger.info("Starting fetch_aircraft_data task...")
     data = fetch_opensky_data()
 
     if not data or "states" not in data:
-        logger.warning("⚠️  No data received from OpenSky API")
+        logger.warning("No data received from OpenSky API!!")
         store_in_redis([], 0)
         return {"aircraft_count": 0, "timestamp": 0}
 
@@ -168,7 +156,7 @@ def fetch_aircraft_data():
     aircraft_list = extract_required_fields(filtered_states)
     store_in_redis(aircraft_list, data.get("time", 0))
 
-    logger.info(f"✅ Processed {len(aircraft_list)} aircraft in Finland out of {len(states)} total")
+    logger.info(f"Processed {len(aircraft_list)} aircraft in Finland out of {len(states)} total.")
 
     return {
         "aircraft_count": len(aircraft_list),

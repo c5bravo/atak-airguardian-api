@@ -21,7 +21,7 @@ if __name__ == "__main__":
     import uvicorn
 
     if settings.mtls_enabled:
-        print("🔒 Starting server with mTLS enabled")
+        print("Starting server with mTLS enabled.")
         uvicorn.run(
             "app.main:app",
             host=settings.api_host,
@@ -33,7 +33,7 @@ if __name__ == "__main__":
             reload=True,
         )
     else:
-        print("⚠️  Starting server without mTLS")
+        print("!!!!Starting server without mTLS!!!!")
         uvicorn.run(
             "app.main:app",
             host=settings.api_host,
