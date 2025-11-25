@@ -5,7 +5,10 @@ celery_app = Celery(
     "aircraft_tracker",
     broker=settings.celery_broker_url,
     backend=settings.celery_result_backend,
-    include=["app.tasks.radar_task"],
+    include=[
+        "app.tasks.radar_task",
+        "app.tasks.generater_task",
+    ],
 )
 
 celery_app.conf.update(

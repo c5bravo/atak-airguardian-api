@@ -105,6 +105,7 @@ def transform_aircraft(aircraft: Dict) -> Dict:
     full_mgrs = convert_to_mgrs(aircraft.get("longitude"), aircraft.get("latitude"))
 
     transformed = {
+        "is_from_opensky": aircraft.get("open_sky"),
         "icao24": aircraft.get("icao24"),
         "callsign": aircraft.get("callsign"),
         "origin_country": aircraft.get("origin_country"),
