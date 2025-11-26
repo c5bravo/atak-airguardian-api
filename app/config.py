@@ -28,12 +28,8 @@ class Settings(BaseSettings):
     finland_lon_max: Optional[float] = 31.5
 
     # API Server Configuration
-    api_host: str
-    api_port: int
-
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    api_host: Optional[str] = "0.0.0.0"
+    api_port: Optional[int] = 8002
 
 
 settings = Settings()
