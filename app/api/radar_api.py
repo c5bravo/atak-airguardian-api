@@ -121,22 +121,3 @@ def get_aircraft_data():
         logger.error(f"Error retrieving aircraft data: {e}")
         return {"error": str(e)}
 
-
-# @router.get("/aircraft/raw")
-# def get_raw_aircraft_data():
-#     """Retrieve raw aircraft data in Finland from Redis without transformation"""
-#     try:
-#         aircraft_json = redis_client.get("finland_aircraft")
-#         last_update_time = redis_client.get("last_update_time")
-
-#         aircraft_list = json.loads(aircraft_json) if aircraft_json else []
-#         timestamp = int(last_update_time) if last_update_time else 0
-
-#         return {
-#             "aircraft_count": len(aircraft_list),
-#             "timestamp": timestamp,
-#             "aircraft": aircraft_list,
-#         }
-#     except Exception as e:
-#         logger.error(f"Error retrieving aircraft data: {e}")
-#         return {"error": str(e), "aircraft_count": 0, "aircraft": []}
