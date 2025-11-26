@@ -74,38 +74,6 @@ EOF
     openssl x509 -req -in certs/client.csr -CA certs/ca.crt -CAkey certs/ca.key \
       -CAcreateserial -out certs/client.crt -days 365 2>/dev/null
 
-    # Redis certificate (with proper SAN)
-    echo "  → Generating Redis Certificate..."
-    cat > certs/redis.cnf <<EOF
-[req]
-distinguished_name = req_distinguished_name
-req_extensions = v3_req
-prompt = no
-
-[req_distinguished_name]
-C = FI
-ST = Uusimaa
-L = Helsinki
-O = ATAKAirGuardian
-CN = redis
-
-[v3_req]
-keyUsage = critical, digitalSignature, keyEncipherment
-extendedKeyUsage = serverAuth, clientAuth
-subjectAltName = @alt_names
-
-[alt_names]
-DNS.1 = redis
-DNS.2 = localhost
-DNS.3 = atak-redis
-IP.1 = 127.0.0.1
-EOF
-
-    openssl genrsa -out certs/redis.key 2048 2>/dev/null
-    openssl req -new -key certs/redis.key -out certs/redis.csr -config certs/redis.cnf 2>/dev/null
-    openssl x509 -req -in certs/redis.csr -CA certs/ca.crt -CAkey certs/ca.key \
-      -CAcreateserial -out certs/redis.crt -days 365 -extensions v3_req -extfile certs/redis.cnf 2>/dev/null
-
     # Create PKCS12 for Postman
     echo "  → Creating PKCS12 certificate for Postman..."
     openssl pkcs12 -export -out certs/client.p12 \

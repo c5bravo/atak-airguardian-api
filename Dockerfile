@@ -10,11 +10,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY pyproject.toml poetry.lock ./
 
-RUN pip install --no-cache-dir poetry==1.7.1
+RUN pip install --no-cache-dir poetry
 RUN poetry config virtualenvs.create false \
     && poetry install --no-root --no-interaction --no-ansi
-
-RUN pip install --no-cache-dir celery
 
 COPY app ./app
 
