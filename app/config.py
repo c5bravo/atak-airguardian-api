@@ -22,10 +22,10 @@ class Settings(BaseSettings):
     opensky_client_secret_3: Optional[str] = None
 
     # Finland Bounding Box
-    finland_lat_min: float
-    finland_lat_max: float
-    finland_lon_min: float
-    finland_lon_max: float
+    finland_lat_min: Optional[float] = 59.5
+    finland_lat_max: Optional[float] = 70.0
+    finland_lon_min: Optional[float] = 19.5
+    finland_lon_max: Optional[float] = 31.5
 
     # API Server Configuration
     api_host: str
