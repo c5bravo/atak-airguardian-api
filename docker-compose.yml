@@ -1,59 +1,4 @@
 services:
-  redis:
-    image: redis:7.0-alpine
-    container_name: atak-redis
-    command: redis-server --port 6379
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - atak-network
-    restart: unless-stopped
-    healthcheck:
-      test: [ "CMD", "redis-cli", "-p", "6379", "ping" ]
-      interval: 10s
-      timeout: 3s
-      retries: 3
-      start_period: 10s
-
-  celery-worker:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: atak-celery-worker
-    command: celery -A app.celery_app worker --loglevel=info --concurrency=4
-    volumes:
-      - ./app:/app/app:ro
-      - ./certs:/app/certs:ro
-    env_file:
-      - .env.docker
-    depends_on:
-      redis:
-        condition: service_healthy
-    networks:
-      - atak-network
-    restart: unless-stopped
-
-  celery-beat:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: atak-celery-beat
-    command: celery -A app.celery_app beat --loglevel=info
-    volumes:
-      - ./app:/app/app:ro
-      - ./certs:/app/certs:ro
-      - celery_beat_data:/app/celerybeat
-    env_file:
-      - .env.docker
-    depends_on:
-      redis:
-        condition: service_healthy
-    networks:
-      - atak-network
-    restart: unless-stopped
-
   api:
     build:
       context: .
@@ -67,9 +12,6 @@ services:
       - ./certs:/app/certs:ro
     env_file:
       - .env.docker
-    depends_on:
-      redis:
-        condition: service_healthy
     networks:
       - atak-network
     restart: unless-stopped
@@ -77,9 +19,3 @@ services:
 networks:
   atak-network:
     driver: bridge
-
-volumes:
-  redis_data:
-    driver: local
-  celery_beat_data:
-    driver: local

@@ -1,8 +1,10 @@
 # app/opensky_auth.py
-import httpx
-import time
 import logging
-from typing import Optional, Dict, List
+import time
+from typing import Dict, List, Optional
+
+import httpx
+
 from app.config import settings
 
 logger = logging.getLogger(__name__)

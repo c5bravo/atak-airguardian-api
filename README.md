@@ -25,32 +25,40 @@ OpenSky API → Celery Worker → Filter Finland → Transform to MGRS → Redis
 ## 🚀 Quick Start - Docker (Recommended)
 
 ### Prerequisites
+
 - Docker & Docker Compose
 - OpenSky Network account (get credentials at https://opensky-network.org)
 
 ### Installation
 
 ## 1. Clone repository
+
 ```bash
 git clone <repo-url>
 cd atak-airguardian-api
 ```
 
 ## 2. Configure environment
+
 ```bash
 cp .env.example .env.docker
 nano .env.docker
 ```
+
 ### Add your OpenSky credentials:
+
 ### OPENSKY_CLIENT_ID=your-client-id
+
 ### OPENSKY_CLIENT_SECRET=your-client-secret
 
-
 ## 3. Poetry install
+
 ```bash
 curl -sSL https://install.python-poetry.org/ | python3 -
 ```
+
 or
+
 ```bash
 echo 'export PATH="/home/user/.local/bin:$PATH"' >> ~/.zshrc
 ```
@@ -61,29 +69,33 @@ poetry lock
 ```
 
 ## 4. Generate certificates
+
 ```bash
 ./setup.sh
 ```
 
-
-
 ## 5. Start services
+
 ### Rebuild
+
 ```bash
 docker compose up -d --build
 ```
 
 ### Stop services
+
 ```bash
 docker compose down
 ```
 
 ### Restart service
+
 ```bash
 docker compose restart celery-worker
 ```
 
 ## 6. Test
+
 ```bash
 curl --cacert certs/ca.crt \
      --cert certs/client.crt \
@@ -94,6 +106,7 @@ curl --cacert certs/ca.crt \
 ## 💻 Local Development - Poetry
 
 ### Prerequisites
+
 - Python 3.12+
 - Poetry
 - Redis 7.0+
@@ -132,6 +145,7 @@ chmod +x setup.sh
 ### Running Locally (4 terminals)
 
 **Terminal 1 - Redis:**
+
 ```bash
 redis-server --port 0 --tls-port 6381 \
   --tls-cert-file certs/redis.crt \
@@ -141,21 +155,25 @@ redis-server --port 0 --tls-port 6381 \
 ```
 
 **Terminal 2 - Celery Worker:**
+
 ```bash
 poetry run celery -A app.celery_app worker --loglevel=info --concurrency=4
 ```
 
 **Terminal 3 - Celery Beat:**
+
 ```bash
 poetry run celery -A app.celery_app beat --loglevel=info
 ```
 
 **Terminal 4 - API:**
+
 ```bash
 poetry run python -m app.main
 ```
 
 **Test:**
+
 ```bash
 curl --cacert certs/ca.crt \
      --cert certs/client.crt \
@@ -217,6 +235,7 @@ curl --cacert certs/ca.crt \
 ### MGRS Position Format
 
 **Example:** `"35VML26"`
+
 - `35V` = Grid Zone (UTM zone + latitude band)
 - `ML` = 100km Square Identifier
 - `26` = 10km precision (first 2 digits of easting)
@@ -244,17 +263,6 @@ curl --cacert certs/ca.crt \
 ### Required Environment Variables
 
 ```bash
-# Redis Configuration
-#####################################
-REDIS_HOST=your_redis_host
-REDIS_PORT=your_redis_port
-REDIS_DB=your_redis_db
-
-# Celery Configuration
-#####################################
-CELERY_BROKER_URL=your_celery_broker_url
-CELERY_RESULT_BACKEND=your_celery_result_backend
-
 # OpenSky API Configuration
 #####################################
 OPENSKY_API_URL=your_opensky_api_url
@@ -273,15 +281,6 @@ FINLAND_LON_MAX=31.5
 #####################################
 API_HOST=your_api_host
 API_PORT=your_api_port
-
-# mTLS Configuration
-#####################################
-MTLS_ENABLED=your_mtls_enabled
-MTLS_CA_CERT=your_mtls_ca_cert_path
-MTLS_SERVER_CERT=your_mtls_server_cert_path
-MTLS_SERVER_KEY=your_mtls_server_key_path
-MTLS_CLIENT_CERT=your_mtls_client_cert_path
-MTLS_CLIENT_KEY=your_mtls_client_key_path
 ```
 
 ---
@@ -289,6 +288,7 @@ MTLS_CLIENT_KEY=your_mtls_client_key_path
 ## 🔌 API Usage
 
 ### cURL
+
 ```bash
 curl --cacert certs/ca.crt \
      --cert certs/client.crt \
@@ -297,6 +297,7 @@ curl --cacert certs/ca.crt \
 ```
 
 ### Python
+
 ```python
 import httpx
 
@@ -309,6 +310,7 @@ print(response.json())
 ```
 
 ### Postman
+
 1. Settings → Certificates → Add Certificate
 2. Host: `localhost:8002`
 3. PFX file: `certs/client.p12`
@@ -319,6 +321,7 @@ print(response.json())
 ## 🛠️ Troubleshooting
 
 ### Empty Aircraft Data
+
 ```bash
 # Wait 30 seconds for first fetch, or manually trigger:
 docker compose exec celery-worker celery -A app.celery_app call app.tasks.radar_task.fetch_aircraft_data
@@ -328,6 +331,7 @@ docker compose logs celery-worker
 ```
 
 ### Certificate Errors
+
 ```bash
 # Regenerate certificates:
 rm -rf certs
@@ -337,6 +341,7 @@ docker compose up --build
 ```
 
 ### Redis Connection Issues
+
 ```bash
 # Check Redis:
 docker compose ps redis
@@ -347,6 +352,7 @@ docker compose exec redis redis-cli --tls --cacert /certs/ca.crt -p 6381 ping
 ```
 
 ### View Logs
+
 ```bash
 # All services
 docker compose logs -f

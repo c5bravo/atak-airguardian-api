@@ -1,6 +1,6 @@
-from pydantic import BaseModel, Field
 from typing import Optional
-from datetime import datetime
+
+from pydantic import BaseModel, Field
 
 
 class AircraftState(BaseModel):
@@ -45,17 +45,4 @@ class AircraftState(BaseModel):
                 "spi": False,
                 "position_source": 0,
             }
-        }
-
-
-class AircraftResponse(BaseModel):
-    """Response schema for filtered aircraft data"""
-
-    total_aircraft: int = Field(..., description="Total number of aircraft in Finland")
-    timestamp: datetime = Field(..., description="Timestamp of data retrieval")
-    aircraft: list[AircraftState] = Field(..., description="List of aircraft states")
-
-    class Config:
-        json_schema_extra = {
-            "example": {"total_aircraft": 5, "timestamp": "2024-10-26T12:00:00", "aircraft": []}
         }
