@@ -70,7 +70,7 @@ EOF
     echo "  → Generating Client Certificate..."
     openssl genrsa -out certs/client.key 2048 2>/dev/null
     openssl req -new -key certs/client.key -out certs/client.csr \
-      -subj "/C=FI/ST=Uusimaa/L=Helsinki/O=ATAKAirGuardian/CN=atak-client" 2>/dev/null
+      -subj "/C=FI/ST=Uusimaa/L=Helsinki/O=ATAKAirGuardian/CN=atak-client" 2>/dev/null  # pragma: allowlist secret
     openssl x509 -req -in certs/client.csr -CA certs/ca.crt -CAkey certs/ca.key \
       -CAcreateserial -out certs/client.crt -days 365 2>/dev/null
 
