@@ -34,7 +34,7 @@ dummy_aircraft_data = [
 client = TestClient(app)
 
 
-@patch("app.api.radar_api.fetch_aircraft_data")  # patch here!
+@patch("app.api.radar_api.fetch_aircraft_data")
 def test_get_aircraft_data(mock_fetch):
     mock_fetch.return_value = dummy_aircraft_data
 
@@ -47,7 +47,7 @@ def test_get_aircraft_data(mock_fetch):
     aircraft = data[0]
     assert aircraft["id"] == "abc123"
     assert aircraft["aircraftId"] == "TEST123"
-    assert aircraft["altitude"] == "surface"  # This depends on your classify_altitude logic
+    assert aircraft["altitude"] == "surface"
     assert aircraft["speed"] == "fast"
     assert aircraft["direction"] == 90
     assert "details" in aircraft
