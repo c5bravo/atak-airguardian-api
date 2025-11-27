@@ -1,6 +1,6 @@
 from typing import Optional
-
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 
 
 class Settings(BaseSettings):
@@ -31,9 +31,10 @@ class Settings(BaseSettings):
     api_host: str
     api_port: int
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    model_config = ConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+    )
 
 
 settings = Settings()

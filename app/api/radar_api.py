@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 from typing import Dict, Optional
+from fastapi import HTTPException
 
 import mgrs
 from fastapi import APIRouter
@@ -90,7 +91,7 @@ def transform_aircraft(aircraft: Dict) -> Dict:
     """Transform a single aircraft object to the new format"""
 
     transformed = {
-        "id": 0,
+        "id": aircraft.get("icao24"),
         "aircraftId": aircraft.get("callsign"),
         # "time_position": convert_timestamp_to_datetime(aircraft.get("time_position")),
         # "last_contact": convert_timestamp_to_datetime(aircraft.get("last_contact")),
@@ -113,11 +114,13 @@ def get_aircraft_data():
     """Retrieve aircraft data in Finland from Redis"""
     try:
         data = fetch_aircraft_data()
-        filtered_data = filter(filter_on_ground, data)
+        filtered_data = list(filter(filter_on_ground, data))
         transformed_aircraft = [transform_aircraft(aircraft) for aircraft in filtered_data]
+
+        if not transformed_aircraft:
+            raise HTTPException(status_code=404, detail="No aircraft found")
 
         return transformed_aircraft
     except Exception as e:
         logger.error(f"Error retrieving aircraft data: {e}")
-        return {"error": str(e)}
-
+        raise HTTPException(status_code=500, detail="Internal Server Error")
