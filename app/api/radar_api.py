@@ -91,7 +91,7 @@ def transform_aircraft(aircraft: Dict) -> Dict:
     """Transform a single aircraft object to the new format"""
 
     transformed = {
-        "id": aircraft.get("icao24"),
+        "id": 0,
         "aircraftId": aircraft.get("callsign"),
         # "time_position": convert_timestamp_to_datetime(aircraft.get("time_position")),
         # "last_contact": convert_timestamp_to_datetime(aircraft.get("last_contact")),
