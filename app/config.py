@@ -1,4 +1,5 @@
 from typing import Optional
+
 from pydantic_settings import BaseSettings
 
 
@@ -31,6 +32,9 @@ class Settings(BaseSettings):
     # API Server Configuration
     api_host: Optional[str] = "127.0.0.1"
     api_port: Optional[int] = 8002
+
+    practool_host: Optional[str] = None
+    practool_port: Optional[int] = None
 
 
 settings = Settings()
