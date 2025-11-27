@@ -120,4 +120,3 @@ def get_aircraft_data():
     except Exception as e:
         logger.error(f"Error retrieving aircraft data: {e}")
         return {"error": str(e)}
-
