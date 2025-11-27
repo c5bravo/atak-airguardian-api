@@ -57,9 +57,7 @@ class OpenSkyAuth:
         # If no numbered keys found, try default (non-numbered)
         if not keys:
             try:
-                if hasattr(settings, "opensky_client_id") and hasattr(
-                    settings, "opensky_client_secret"
-                ):
+                if hasattr(settings, "opensky_client_id") and hasattr(settings, "opensky_client_secret"):
                     if settings.opensky_client_id and settings.opensky_client_secret:
                         keys.append(
                             {
@@ -102,9 +100,7 @@ class OpenSkyAuth:
                 response = client.post(self.token_url, data=data)
 
                 if response.status_code != 200:
-                    logger.error(
-                        f"❌ Token request failed for key {key_index}: {response.status_code}"
-                    )
+                    logger.error(f"❌ Token request failed for key {key_index}: {response.status_code}")
                     logger.error(f"Response: {response.text}")
                     return None
 
@@ -117,9 +113,7 @@ class OpenSkyAuth:
                 self._access_tokens[key_index] = access_token
                 self._token_expires_at[key_index] = time.time() + expires_in
 
-                logger.info(
-                    f"✅ OpenSky token obtained for key {key_index} (expires in {expires_in}s)"
-                )
+                logger.info(f"✅ OpenSky token obtained for key {key_index} (expires in {expires_in}s)")
                 return access_token
 
         except httpx.HTTPError as e:
