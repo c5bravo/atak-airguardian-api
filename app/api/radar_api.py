@@ -1,10 +1,11 @@
 import logging
 from datetime import datetime
-from typing import Dict, Optional, List, Any, TypedDict
-from fastapi import HTTPException, APIRouter
+from typing import Any, Dict, List, Optional, TypedDict
 
 import mgrs  # type: ignore
+from fastapi import APIRouter, HTTPException
 
+from app.tasks.practice_task import fetch_practice_data
 from app.tasks.radar_task import fetch_aircraft_data
 
 logger = logging.getLogger(__name__)
@@ -25,7 +26,7 @@ class TransformedAircraft(TypedDict, total=False):
 
 
 def to_mgrs_typed(latitude: float, longitude: float) -> str:
-    mgrs_string: str = mgrs_converter.toMGRS(latitude, longitude, True, 5)
+    mgrs_string: str = mgrs_converter.toMGRS(latitude, longitude, True, 1)  # type: ignore[attr-defined]
     return mgrs_string
 
 
@@ -50,21 +51,6 @@ def convert_to_mgrs(longitude: Optional[float], latitude: Optional[float]) -> Op
     except Exception as e:
         logger.error(f"Error converting coordinates ({latitude}, {longitude}) to MGRS: {e}")
         return None
-
-
-def shorten_mgrs(mgrs_full: str) -> str:
-    if not mgrs_full or len(mgrs_full) < 5:
-        return mgrs_full
-
-    grid_zone = mgrs_full[:5]  # e.g. "36WVT"
-    rest = mgrs_full[5:]
-
-    mid = len(rest) // 2
-    easting = rest[:mid]
-    northing = rest[mid:]
-
-    short = f"{grid_zone}{easting[0]}{northing[0]}"
-    return short
 
 
 def classify_altitude(altitude: Optional[float]) -> Optional[str]:
@@ -133,10 +119,9 @@ def get_aircraft_data() -> List[TransformedAircraft]:
         filtered_data = list(filter(filter_on_ground, data))
         transformed_aircraft = [transform_aircraft(ac) for ac in filtered_data]
 
-        if not transformed_aircraft:
-            raise HTTPException(status_code=404, detail="No aircraft found")
+        practice_data = fetch_practice_data()
 
-        return transformed_aircraft
+        return [*transformed_aircraft, *practice_data]
     except Exception as e:
         logger.error(f"Error retrieving aircraft data: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
