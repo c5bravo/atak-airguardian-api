@@ -105,6 +105,15 @@ curl --cacert certs/ca.crt \
 
 ## 💻 Local Development - Poetry
 
+### pre-commit
+
+Ensures quality, enable it locally to avoid CI yelling at you
+
+```console
+pre-commit install --install-hooks
+pre-commit run --all-files
+```
+
 ### Prerequisites
 
 - Python 3.12+
