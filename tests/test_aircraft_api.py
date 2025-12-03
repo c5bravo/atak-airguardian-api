@@ -5,7 +5,7 @@ from app.main import app
 
 dummy_aircraft_data = [
     {
-        "icao24": "abc123",
+        "icao24": 0,
         "callsign": "TEST123",
         "time_position": 1698500000,
         "last_contact": 1698500100,
@@ -18,7 +18,7 @@ dummy_aircraft_data = [
         "on_ground": False,
     },
     {
-        "icao24": "def456",
+        "icao24": 0,
         "callsign": "GROUND1",
         "longitude": 24.93545,
         "latitude": 60.16952,
@@ -44,7 +44,7 @@ def test_get_aircraft_data(mock_fetch):
     assert len(data) == 1  # Only the aircraft not on the ground should be included
 
     aircraft = data[0]
-    assert aircraft["id"] == "abc123"
+    assert aircraft["id"] == 0
     assert aircraft["aircraftId"] == "TEST123"
     assert aircraft["altitude"] == "surface"
     assert aircraft["speed"] == "fast"

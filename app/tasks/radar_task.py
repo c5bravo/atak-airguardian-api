@@ -21,13 +21,13 @@ def build_opensky_url() -> str:
     # Add bounding box parameters
     url = (
         f"{base_url}?"
-        f"lamin={settings.finland_lat_min}&"
-        f"lamax={settings.finland_lat_max}&"
-        f"lomin={settings.finland_lon_min}&"
-        f"lomax={settings.finland_lon_max}"
+        f"lamin={settings.lat_min}&"
+        f"lamax={settings.lat_max}&"
+        f"lomin={settings.lon_min}&"
+        f"lomax={settings.lon_max}"
     )
 
-    logger.info(f"Using bounding box: Finland ({settings.finland_lat_min}°N to {settings.finland_lat_max}°N)")
+    logger.info(f"Using bounding box: Finland ({settings.lat_min}°N to {settings.lat_max}°N)")
     return url
 
 
@@ -57,7 +57,9 @@ def fetch_opensky_data() -> Dict:
 
                 # Check for rate limit (HTTP 429)
                 if response.status_code == 429:
-                    logger.warning(f"⚠️  Rate limit 429 on key {key_info['key_index']}! Trying next key...")
+                    logger.warning(
+                        f"⚠️  Rate limit 429 on key {key_info['key_index']}! Trying next key..."
+                    )
                     opensky_auth.rotate_key()
                     continue  # Try next key
 
