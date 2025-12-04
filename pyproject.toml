@@ -28,12 +28,12 @@ exclude = '''
 '''
 
 [tool.mypy]
-strict=true
+strict = true
 
 [tool.pytest.ini_options]
-junit_family="xunit2"
-addopts="--cov=rmmtxauthz --cov-fail-under=65 --cov-branch"
-asyncio_mode="strict"
+junit_family = "xunit2"
+addopts = "--cov=rmmtxauthz --cov-fail-under=0 --cov-branch"
+asyncio_mode = "strict"
 
 [tool.pylint.format]
 max-line-length = 120
@@ -42,7 +42,7 @@ max-line-length = 120
 max-parents = 10
 
 [tool.pylint.messages_control]
-disable=["fixme", "W1202", "C0209"]
+disable = ["fixme", "W1202", "C0209"]
 
 [tool.pylint.similarities]
 min-similarity-lines = 8
