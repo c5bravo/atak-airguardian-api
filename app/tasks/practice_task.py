@@ -2,13 +2,14 @@ import logging
 
 import httpx
 
+from app.api.radar_api import TransformedAircraft
 from app.config import settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def fetch_practice_data() -> list:
+def fetch_practice_data() -> list[TransformedAircraft]:
     if not settings.practool_host or not settings.practool_port:
         return []
 
@@ -20,7 +21,8 @@ def fetch_practice_data() -> list:
 
             response.raise_for_status()
             logger.info("✅ Successfully fetched data from Practice API")
-            return response.json()
+            data: list[TransformedAircraft] = response.json()
+            return data
 
     except httpx.HTTPError as e:
         logger.error(f"❌ HTTP error occurred: {e}")
