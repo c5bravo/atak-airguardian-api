@@ -26,7 +26,7 @@ class TransformedAircraft(TypedDict, total=False):
 
 
 def to_mgrs_typed(latitude: float, longitude: float) -> str:
-    mgrs_string: str = mgrs_converter.toMGRS(latitude, longitude, True, 1)  # type: ignore[attr-defined]
+    mgrs_string: str = mgrs_converter.toMGRS(latitude, longitude, True, 1)  # pyright: ignore[reportUnknownMemberType]
     return mgrs_string
 
 
