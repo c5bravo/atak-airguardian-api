@@ -4,8 +4,8 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     # OpenSky API Configuration
-    opensky_api_url: str
-    opensky_token_url: str
+    opensky_api_url: Optional[str] = None
+    opensky_token_url: Optional[str] = None
     # Default/single key (fallback)
     opensky_client_id: Optional[str] = None
     opensky_client_secret: Optional[str] = None
@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     # API Server Configuration
     api_host: Optional[str] = "0.0.0.0"
     api_port: Optional[int] = 8002
+
+    practool_host: Optional[str] = None
+    practool_port: Optional[int] = None
 
 
 settings = Settings()
