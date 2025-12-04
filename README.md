@@ -47,13 +47,8 @@ nano .env.docker
 
 ##### OPENSKY_CLIENT_SECRET=your-client-secret
 
-#### 3. Generate certificates
 
-```bash
-./setup.sh
-```
-
-### 4. Start services
+### 3. Start services
 
 ##### Rebuild
 
@@ -67,18 +62,11 @@ docker compose up -d --build
 docker compose down
 ```
 
-##### Restart service
-
-```bash
-docker compose restart celery-worker
-```
-##
-
 ## Local Development - Poetry
 
 ##### pre-commit
 
-Ensures quality, enable it locally to avoid CI yelling at you
+Ensures quality, enable pre-commit
 
 ```console
 pre-commit install --install-hooks
