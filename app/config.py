@@ -30,8 +30,8 @@ class Settings(BaseSettings):
     lon_max: Optional[float] = 31.5
 
     # API Server Configuration
-    api_host: Optional[str] = "127.0.0.1"
-    api_port: Optional[int] = 8002
+    api_host: str = "127.0.0.1"
+    api_port: int = 8002
 
     practool_host: Optional[str] = None
     practool_port: Optional[int] = None
