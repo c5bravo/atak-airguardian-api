@@ -1,9 +1,10 @@
-from fastapi.testclient import TestClient
+from typing import List, Dict, Any
 from unittest.mock import patch, MagicMock
+from fastapi.testclient import TestClient
 
 from app.main import app
 
-dummy_aircraft_data = [
+dummy_aircraft_data: List[Dict[str, Any]] = [
     {
         "callsign": "TEST123",
         "time_position": 1698500000,

@@ -10,7 +10,7 @@ Fetches live aircraft data from Practice tool and OpenSky Network, the user filt
 
 ```
 Data API  →  Filter "Finland" → Transform to MGRS  → FastAPI
-(OAuth2)       (59.5-70°N)     (classifications)  
+(OAuth2)       (59.5-70°N)     (classifications)
 ```
 
 1. **Task** gets data from Data API (OAuth2 auth)
@@ -90,32 +90,6 @@ pre-commit run --all-files
 - Python 3.12+
 - Poetry
 - OpenSky credentials
-
-##### Installation
-
-```bash
-# 1. Clone repository
-git clone <repo-url>
-cd atak-airguardian-api
-
-# 2. Install Poetry
-curl -sSL https://install.python-poetry.org | python3 -
-export PATH="$HOME/.local/bin:$PATH"
-
-# 3. Install dependencies
-poetry install --no-root
-
-# 4. Configure environment
-cp .env.example .env
-nano .env
-# Update:
-# OPENSKY_CLIENT_ID=your-client-id
-# OPENSKY_CLIENT_SECRET=your-client-secret
-
-# 5. Generate certificates
-chmod +x setup.sh
-./setup.sh
-```
 
 ##### Running Locally
 
@@ -216,11 +190,6 @@ API_PORT=your_api_port
 ### Certificate Errors
 
 ```bash
-# Regenerate certificates:
-rm -rf certs
-
-./setup.sh
-
 docker compose down
 
 docker compose up --build

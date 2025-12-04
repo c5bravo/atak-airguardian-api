@@ -25,11 +25,12 @@ class TransformedAircraft(TypedDict, total=False):
 
 
 def to_mgrs_typed(latitude: float, longitude: float) -> str:
-    mgrs_string: str = mgrs_converter.toMGRS(latitude, longitude, True, 5)  # type: ignore[attr-defined]
+    mgrs_string: str = mgrs_converter.toMGRS(latitude, longitude, True, 5)
     return mgrs_string
 
 
 def convert_timestamp_to_datetime(timestamp: Optional[int]) -> Optional[str]:
+    """Convert UNIX timestamp to formatted datetime string."""
     if timestamp is None:
         return None
     try:
