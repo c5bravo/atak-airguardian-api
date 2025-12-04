@@ -1,10 +1,11 @@
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional, TypedDict
+from typing import Any, Dict, List, Optional
 
 import mgrs  # type: ignore
 from fastapi import APIRouter, HTTPException
 
+from app.schemas.schema import TransformedAircraft
 from app.tasks.practice_task import fetch_practice_data
 from app.tasks.radar_task import fetch_aircraft_data
 
@@ -13,16 +14,6 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/radar", tags=["radar"])
 
 mgrs_converter = mgrs.MGRS()
-
-
-class TransformedAircraft(TypedDict, total=False):
-    id: int
-    aircraftId: Optional[str]
-    position: Optional[str]
-    altitude: Optional[str]
-    speed: Optional[str]
-    direction: int
-    details: Optional[str]
 
 
 def to_mgrs_typed(latitude: float, longitude: float) -> str:

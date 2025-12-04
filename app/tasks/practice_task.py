@@ -2,8 +2,8 @@ import logging
 
 import httpx
 
-from app.api.radar_api import TransformedAircraft
 from app.config import settings
+from app.schemas.schema import TransformedAircraft
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
