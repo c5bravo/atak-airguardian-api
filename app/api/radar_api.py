@@ -1,10 +1,9 @@
 import logging
 from datetime import datetime
-from typing import Dict, Optional
-from fastapi import HTTPException
+from typing import Dict, Optional, List, Any, TypedDict
+from fastapi import HTTPException, APIRouter
 
-import mgrs
-from fastapi import APIRouter
+import mgrs  # type: ignore
 
 from app.tasks.radar_task import fetch_aircraft_data
 
@@ -12,12 +11,25 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/radar", tags=["radar"])
 
-# Initialize MGRS converter
 mgrs_converter = mgrs.MGRS()
 
 
+class TransformedAircraft(TypedDict, total=False):
+    id: int
+    aircraftId: Optional[str]
+    position: Optional[str]
+    altitude: Optional[str]
+    speed: Optional[str]
+    direction: int
+    details: Optional[str]
+
+
+def to_mgrs_typed(latitude: float, longitude: float) -> str:
+    mgrs_string: str = mgrs_converter.toMGRS(latitude, longitude, True, 5)  # type: ignore[attr-defined]
+    return mgrs_string
+
+
 def convert_timestamp_to_datetime(timestamp: Optional[int]) -> Optional[str]:
-    """Convert Unix timestamp to dd.mm.yyyy hh:mm:ss format"""
     if timestamp is None:
         return None
     try:
@@ -29,12 +41,10 @@ def convert_timestamp_to_datetime(timestamp: Optional[int]) -> Optional[str]:
 
 
 def convert_to_mgrs(longitude: Optional[float], latitude: Optional[float]) -> Optional[str]:
-    """Convert longitude/latitude to full-precision MGRS format"""
     if longitude is None or latitude is None:
         return None
-
     try:
-        mgrs_string = mgrs_converter.toMGRS(latitude, longitude, True, 1)
+        mgrs_string: str = to_mgrs_typed(latitude, longitude)
         return mgrs_string.strip().replace(" ", "")
     except Exception as e:
         logger.error(f"Error converting coordinates ({latitude}, {longitude}) to MGRS: {e}")
@@ -42,7 +52,6 @@ def convert_to_mgrs(longitude: Optional[float], latitude: Optional[float]) -> Op
 
 
 def shorten_mgrs(mgrs_full: str) -> str:
-    """Return a readable shortened MGRS (auto-adjust precision)."""
     if not mgrs_full or len(mgrs_full) < 5:
         return mgrs_full
 
@@ -53,15 +62,13 @@ def shorten_mgrs(mgrs_full: str) -> str:
     easting = rest[:mid]
     northing = rest[mid:]
 
-    short = f"{grid_zone}{easting[1]}{northing[1]}"
+    short = f"{grid_zone}{easting[0]}{northing[0]}"
     return short
 
 
 def classify_altitude(altitude: Optional[float]) -> Optional[str]:
-    """Classify altitude in meters"""
     if altitude is None:
         return None
-
     if altitude < 300:
         return "surface"
     elif altitude < 3000:
@@ -71,10 +78,8 @@ def classify_altitude(altitude: Optional[float]) -> Optional[str]:
 
 
 def classify_speed(velocity: Optional[float]) -> Optional[str]:
-    """Classify speed in m/s"""
     if velocity is None:
         return None
-
     if velocity < 140:
         return "slow"
     elif velocity < 280:
@@ -83,39 +88,49 @@ def classify_speed(velocity: Optional[float]) -> Optional[str]:
         return "supersonic"
 
 
-def more_details(aircraft: Optional[Dict]) -> Optional[str]:
-    return f"This aircraft[{aircraft.get('callsign')}] from [{aircraft.get('origin_country')}] and it is civilian aircraft."
+def more_details(aircraft: Optional[Dict[str, Any]]) -> Optional[str]:
+    if not aircraft:
+        return None
+
+    callsign = aircraft.get("callsign")
+    origin_country = aircraft.get("origin_country")
+
+    if not isinstance(callsign, str) or not isinstance(origin_country, str):
+        return None
+
+    return f"This aircraft[{callsign}] from [{origin_country}] and it is civilian aircraft."
 
 
-def transform_aircraft(aircraft: Dict) -> Dict:
-    """Transform a single aircraft object to the new format"""
+def transform_aircraft(aircraft: Dict[str, Any]) -> TransformedAircraft:
+    true_track_raw = aircraft.get("true_track")
+    try:
+        true_track = int(true_track_raw) if true_track_raw is not None else 0
+    except (ValueError, TypeError):
+        true_track = 0
 
-    transformed = {
+    transformed: TransformedAircraft = {
         "id": 0,
         "aircraftId": aircraft.get("callsign"),
-        # "time_position": convert_timestamp_to_datetime(aircraft.get("time_position")),
-        # "last_contact": convert_timestamp_to_datetime(aircraft.get("last_contact")),
         "position": convert_to_mgrs(aircraft.get("longitude"), aircraft.get("latitude")),
         "altitude": classify_altitude(aircraft.get("baro_altitude")),
         "speed": classify_speed(aircraft.get("velocity")),
-        "direction": int(aircraft.get("true_track")),
+        "direction": true_track,
         "details": more_details(aircraft),
     }
-
     return transformed
 
 
-def filter_on_ground(aircraft: Dict) -> bool:
-    return not aircraft.get("on_ground")
+def filter_on_ground(aircraft: Dict[str, Any]) -> bool:
+    # Only aircraft not on ground
+    return not bool(aircraft.get("on_ground"))
 
 
 @router.get("/aircraft")
-def get_aircraft_data():
-    """Retrieve aircraft data in Finland from Redis"""
+def get_aircraft_data() -> List[TransformedAircraft]:
     try:
         data = fetch_aircraft_data()
         filtered_data = list(filter(filter_on_ground, data))
-        transformed_aircraft = [transform_aircraft(aircraft) for aircraft in filtered_data]
+        transformed_aircraft = [transform_aircraft(ac) for ac in filtered_data]
 
         if not transformed_aircraft:
             raise HTTPException(status_code=404, detail="No aircraft found")

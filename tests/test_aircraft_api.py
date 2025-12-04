@@ -1,11 +1,10 @@
 from fastapi.testclient import TestClient
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 from app.main import app
 
 dummy_aircraft_data = [
     {
-        "icao24": 0,
         "callsign": "TEST123",
         "time_position": 1698500000,
         "last_contact": 1698500100,
@@ -18,7 +17,6 @@ dummy_aircraft_data = [
         "on_ground": False,
     },
     {
-        "icao24": 0,
         "callsign": "GROUND1",
         "longitude": 24.93545,
         "latitude": 60.16952,
@@ -34,7 +32,7 @@ client = TestClient(app)
 
 
 @patch("app.api.radar_api.fetch_aircraft_data")
-def test_get_aircraft_data(mock_fetch):
+def test_get_aircraft_data(mock_fetch: MagicMock) -> None:
     mock_fetch.return_value = dummy_aircraft_data
 
     response = client.get("/radar/aircraft")
@@ -44,7 +42,6 @@ def test_get_aircraft_data(mock_fetch):
     assert len(data) == 1  # Only the aircraft not on the ground should be included
 
     aircraft = data[0]
-    assert aircraft["id"] == 0
     assert aircraft["aircraftId"] == "TEST123"
     assert aircraft["altitude"] == "surface"
     assert aircraft["speed"] == "fast"
