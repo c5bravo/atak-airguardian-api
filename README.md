@@ -1,10 +1,10 @@
-# ATAK Air Guardian Proxy
+# ATAK AirGuardian Proxy
 
 A secure REST API that tracks aircraft in real-time using Practice tool API and OpenSky Network data.
 
 ## What It Does
 
-Fetches live aircraft data from Practice tool and OpenSky Network, the user filter for airspace, transforms coordinates to MGRS (Military Grid Reference System), and serves the data via a secure API.
+Fetches live aircraft data from Practice tool and OpenSky Network, the user filters for airspace, transforms coordinates to MGRS (Military Grid Reference System), and serves the data via secure API.
 
 ## How It Works
 
@@ -14,7 +14,7 @@ Data API  →  Filter "Finland" → Transform to MGRS  → FastAPI
 ```
 
 1. **Task** gets data from Data API (OAuth2 auth)
-2. **Filter** keeps only aircraft over Finland (59.5-70°N, 19.5-31.5°E)
+2. **Filter** keeps only aircrafts over Finland (59.5-70°N, 19.5-31.5°E)
 3. **Transform** converts GPS to MGRS + classifies altitude/speed in Finnish
 4. **FastAPI** serves data via mTLS-secured HTTPS
 
@@ -66,7 +66,7 @@ docker compose down
 
 ##### pre-commit
 
-Ensures quality, enable pre-commit
+Ensures quality by enabling pre-commit hooks
 
 ```console
 pre-commit install --install-hooks
@@ -145,13 +145,13 @@ curl https://localhost:8002/radar/aircraft
 
 ```bash
 # DATA API Configuration
-#####################################
+
 DATA_API_URL=
 
 or
 
 # OpenSky API Configuration
-#####################################
+
 OPENSKY_API_URL=your_opensky_api_url
 OPENSKY_TOKEN_URL=your_opensky_token_url
 
@@ -159,21 +159,18 @@ OPENSKY_CLIENT_ID=your_opensky_client_id
 OPENSKY_CLIENT_SECRET=your_opensky_client_secret
 
 # Finland Bounding Box for Example
-#####################################
+
 LAT_MIN=59.5
 LAT_MAX=70.0
 LON_MIN=19.5
 LON_MAX=31.5
 
 # API Server Configuration
-#####################################
+
 API_HOST=your_api_host
 API_PORT=your_api_port
 ```
-
 ---
-
-## Troubleshooting
 
 ### Certificate Errors
 
@@ -190,7 +187,6 @@ docker compose up --build
 docker compose logs -f
 
 ```
-
 ---
 
 ## Security
