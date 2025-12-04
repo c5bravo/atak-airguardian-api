@@ -20,10 +20,13 @@ app.include_router(radar_api.router)
 if __name__ == "__main__":
     import uvicorn
 
+    host = settings.api_host or "127.0.0.1"
+    port = settings.api_port or 8000
+
     print("Starting server")
     uvicorn.run(
         "app.main:app",
-        host=settings.api_host,
-        port=settings.api_port,
+        host=host,
+        port=port,
         reload=True,
     )

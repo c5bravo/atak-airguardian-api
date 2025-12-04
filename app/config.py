@@ -4,8 +4,10 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     # OpenSky API Configuration
-    opensky_api_url: str
-    opensky_token_url: str
+    opensky_api_url: str = "https://opensky-network.org/api/states/all"
+    opensky_token_url: str = (
+        "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token"
+    )
     # Default/single key (fallback)
     opensky_client_id: Optional[str] = None
     opensky_client_secret: Optional[str] = None
