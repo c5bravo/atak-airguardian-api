@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "test-radar"
+name = "airguard-api"
 version = "0.1.0"
 description = "Finland Aircraft Tracker API with mTLS support"
 authors = ["Eagle <eagle@example.com>"]
 readme = "README.md"
-package-mode = false
+packages = [{ include = "app" }]
 
 [tool.black]
 line-length = 120
@@ -55,7 +55,7 @@ branch = true
 
 [tool.poetry.dependencies]
 python = "^3.12"
-fastapi = "^0.120.0"
+fastapi = { extras = ["standard"], version = "^0.124.2" }
 uvicorn = "^0.38.0"
 python-dotenv = "^1.2.1"
 httpx = "^0.28.1"
