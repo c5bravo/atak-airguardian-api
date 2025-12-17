@@ -80,7 +80,8 @@ async def return_product_description_extended(language: str) -> ProductDescripti
             icon=None,
             description=""""Airguardian""",
             language=language,
-            component=ProductComponent(type="link", ref=md_url),
+            docs="NA",
+            component=ProductComponent(type="link", ref="google.com"),
         )
     if language == "sv":
         return ProductDescriptionExtended(
@@ -89,7 +90,8 @@ async def return_product_description_extended(language: str) -> ProductDescripti
             icon=None,
             description="Airguardian",
             language=language,
-            component=ProductComponent(type="link", ref=md_url),
+            docs="NA",
+            component=ProductComponent(type="link", ref="google.com"),
         )
     return ProductDescriptionExtended(
         shortname=shortname,
@@ -97,5 +99,6 @@ async def return_product_description_extended(language: str) -> ProductDescripti
         icon=None,
         description="Airguardian",
         language=language,
-        component=ProductComponent(type="link", ref=md_url),
+        docs="NA",
+        component=ProductComponent(type="link", ref="google.com"),
     )

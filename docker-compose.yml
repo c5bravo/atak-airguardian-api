@@ -6,7 +6,7 @@ services:
     container_name: atak-api
     command: python -m app.main
     ports:
-      - "8002:8002"
+      - "8010:8010"
     volumes:
       - ./app:/app/app:ro
       - ./certs:/app/certs:ro
