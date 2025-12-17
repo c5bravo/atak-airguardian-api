@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import radar_api
 from app.config import settings
+from .api import all_routers, all_routers_v2
 
 app = FastAPI()
 
@@ -15,6 +16,8 @@ app.add_middleware(
 )
 
 app.include_router(radar_api.router)
+app.include_router(router=all_routers, prefix="/api/v1")
+app.include_router(router=all_routers_v2, prefix="/api/v2")
 
 
 if __name__ == "__main__":
