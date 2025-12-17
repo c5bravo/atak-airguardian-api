@@ -6,6 +6,7 @@ import logging
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field, Extra
 from libpvarki.schemas.product import ProductDescription
+from app.config import read_ag_fqdn
 
 
 LOGGER = logging.getLogger(__name__)
@@ -81,7 +82,7 @@ async def return_product_description_extended(language: str) -> ProductDescripti
             description="Ilmavalvonta harjoitus datan luonti",
             language=language,
             docs="NA",
-            component=ProductComponent(type="link", ref="https://agpractice.localmaeher.dev.pvarki.fi:4626/"),
+            component=ProductComponent(type="link", ref="https://" + read_ag_fqdn() + ":4626"),
         )
     if language == "sv":
         return ProductDescriptionExtended(
@@ -91,7 +92,7 @@ async def return_product_description_extended(language: str) -> ProductDescripti
             description="Skapande av data för luftövervakningsövningar",
             language=language,
             docs="NA",
-            component=ProductComponent(type="link", ref="https://agpractice.localmaeher.dev.pvarki.fi:4626/"),
+            component=ProductComponent(type="link", ref="https://" + read_ag_fqdn() + ":4626"),
         )
     return ProductDescriptionExtended(
         shortname=shortname,
@@ -100,5 +101,5 @@ async def return_product_description_extended(language: str) -> ProductDescripti
         description="Create practice data for air surveillance",
         language=language,
         docs="NA",
-        component=ProductComponent(type="link", ref="https://agpractice.localmaeher.dev.pvarki.fi:4626/"),
+        component=ProductComponent(type="link", ref="https://" + read_ag_fqdn() + ":4626"),
     )

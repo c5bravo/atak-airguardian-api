@@ -1,6 +1,8 @@
-from typing import Optional
-
+from typing import Optional, Any, Dict, cast
 from pydantic_settings import BaseSettings
+from pathlib import Path
+import json
+import functools
 
 
 class Settings(BaseSettings):
@@ -38,3 +40,25 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+@functools.cache
+def load_manifest(filepth: Path = Path("/pvarki/kraftwerk-init.json")) -> Dict[str, Any]:
+    """Load the manifest"""
+    if not filepth.exists():
+        rm_uri = "https://localmaeher.dev.pvarki.fi"
+        mtls_uri = rm_uri.replace("https://", "https://mtls.")
+        tool_uri = rm_uri.replace("airguardian", "agpractice")
+        return {
+            "deployment": "localmaeher",
+            "rasenmaeher": {
+                "init": {"base_uri": tool_uri, "csr_jwt": "LOL, no"},
+                "mtls": {"base_uri": mtls_uri},
+                "certcn": "rasenmaeher",
+            },
+            "product": {"dns": "agpractice.localmaeher.dev.pvarki.fi"},
+        }
+    return cast(Dict[str, Any], json.loads(filepth.read_text(encoding="utf-8")))
+
+def read_ag_fqdn() -> str:
+    """Read the fqdn from manifest"""
+    return str(load_manifest()["product"]["dns"])
