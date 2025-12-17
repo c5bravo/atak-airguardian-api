@@ -76,29 +76,29 @@ async def return_product_description_extended(language: str) -> ProductDescripti
     if language == "fi":
         return ProductDescriptionExtended(
             shortname=shortname,
-            title="Airguardian",
+            title="Airguardian harjoitustyökalu",
             icon=None,
-            description=""""Airguardian""",
+            description="Ilmavalvonta harjoitus datan luonti",
             language=language,
             docs="NA",
-            component=ProductComponent(type="link", ref="google.com"),
+            component=ProductComponent(type="link", ref="https://agpractice.localmaeher.dev.pvarki.fi:4626/"),
         )
     if language == "sv":
         return ProductDescriptionExtended(
             shortname=shortname,
-            title="Airguardian",
+            title="Airguardian träningsverktyg",
             icon=None,
-            description="Airguardian",
+            description="Skapande av data för luftövervakningsövningar",
             language=language,
             docs="NA",
-            component=ProductComponent(type="link", ref="google.com"),
+            component=ProductComponent(type="link", ref="https://agpractice.localmaeher.dev.pvarki.fi:4626/"),
         )
     return ProductDescriptionExtended(
         shortname=shortname,
-        title="Airguardian",
+        title="Airguardian practice tool",
         icon=None,
-        description="Airguardian",
+        description="Create practice data for air surveillance",
         language=language,
         docs="NA",
-        component=ProductComponent(type="link", ref="google.com"),
+        component=ProductComponent(type="link", ref="https://agpractice.localmaeher.dev.pvarki.fi:4626/"),
     )
