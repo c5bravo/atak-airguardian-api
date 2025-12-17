@@ -108,6 +108,7 @@ RUN --mount=type=ssh apt-get update && apt-get install -y \
     && chmod a+x /container-init.sh \
     && WHEELFILE=`echo /tmp/wheelhouse/airguard_api-*.whl` \
     && pip3 install --find-links=/tmp/wheelhouse/ "$WHEELFILE"[all] \
+    && pip3 install packaging \
     && rm -rf /tmp/wheelhouse/ \
     # Do whatever else you need to
     && true
