@@ -25,7 +25,9 @@ class ProductComponent(BaseModel):  # pylint: disable=too-few-public-methods
 class ProductDescriptionExtended(BaseModel):  # pylint: disable=too-few-public-methods
     """Description of a product"""
 
-    shortname: str = Field(description="Short name for the product, used as slug/key in dicts and urls")
+    shortname: str = Field(
+        description="Short name for the product, used as slug/key in dicts and urls"
+    )
     title: str = Field(description="Fancy name for the product")
     icon: Optional[str] = Field(description="URL for icon")
     description: str = Field(description="Short-ish description of the product")

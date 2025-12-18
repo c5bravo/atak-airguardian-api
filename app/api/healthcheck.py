@@ -15,5 +15,5 @@ router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 @router.get("")
 async def request_healthcheck() -> ProductHealthCheckResponse:
     """Check that we are healthy, return accordingly"""
-    
+
     return ProductHealthCheckResponse(healthy=True)
