@@ -59,6 +59,6 @@ def load_manifest(filepth: Path = Path("/pvarki/kraftwerk-init.json")) -> Dict[s
         }
     return cast(Dict[str, Any], json.loads(filepth.read_text(encoding="utf-8")))
 
-def read_ag_fqdn() -> str:
-    """Read the fqdn from manifest"""
-    return str(load_manifest()["product"]["dns"])
+def read_ag_uri() -> str:
+    """Read the uri from manifest"""
+    return str(load_manifest()["product"]["uri"])
