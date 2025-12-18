@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     lon_max: Optional[float] = 31.5
 
     # API Server Configuration
-    api_host: str = "0.0.0.0"
+    api_host: str = "0.0.0.0"  # nosec
     api_port: int = 8010
 
     practool_host: Optional[str] = None
@@ -40,6 +40,7 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
 
 @functools.cache
 def load_manifest(filepth: Path = Path("/pvarki/kraftwerk-init.json")) -> Dict[str, Any]:
@@ -58,6 +59,7 @@ def load_manifest(filepth: Path = Path("/pvarki/kraftwerk-init.json")) -> Dict[s
             "product": {"dns": "agpractice.localmaeher.dev.pvarki.fi"},
         }
     return cast(Dict[str, Any], json.loads(filepth.read_text(encoding="utf-8")))
+
 
 def read_ag_uri() -> str:
     """Read the uri from manifest"""

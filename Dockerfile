@@ -76,7 +76,7 @@ FROM builder_base as production_build
 COPY ./docker/entrypoint.sh /docker-entrypoint.sh
 COPY ./docker/container-init.sh /container-init.sh
 # Only files needed by production setup
-COPY . . 
+COPY . .
 
 # Build the wheel package with poetry and add it to the wheelhouse
 RUN --mount=type=ssh source /.venv/bin/activate \
