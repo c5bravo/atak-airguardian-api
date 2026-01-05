@@ -9,7 +9,6 @@ services:
       - "8010:8010"
     volumes:
       - ./app:/app/app:ro
-      - ./certs:/app/certs:ro
     env_file:
       - .env.docker
     networks:

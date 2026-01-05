@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException
 
 from app.schemas.schema import TransformedAircraft
 from app.tasks.practice_task import fetch_practice_data
-from app.tasks.radar_task import fetch_aircraft_data
+# from app.tasks.radar_task import fetch_aircraft_data
 
 logger = logging.getLogger(__name__)
 
@@ -94,6 +94,7 @@ def transform_aircraft(aircraft: Dict[str, Any]) -> TransformedAircraft:
         "speed": classify_speed(aircraft.get("velocity")),
         "direction": true_track,
         "details": more_details(aircraft),
+        "isExited": bool(aircraft.get("isExited")),
     }
     return transformed
 
@@ -106,13 +107,15 @@ def filter_on_ground(aircraft: Dict[str, Any]) -> bool:
 @router.get("/aircraft")
 def get_aircraft_data() -> List[TransformedAircraft]:
     try:
-        data = fetch_aircraft_data()
-        filtered_data = list(filter(filter_on_ground, data))
-        transformed_aircraft = [transform_aircraft(ac) for ac in filtered_data]
+        # --- IF You want to use OpenSky data Remove comments ---
+        # data = fetch_aircraft_data()
+        # filtered_data = list(filter(filter_on_ground, data))
+        # transformed_aircraft = [transform_aircraft(ac) for ac in filtered_data]
 
         practice_data = fetch_practice_data()
 
-        return [*transformed_aircraft, *practice_data]
+        # return [*transformed_aircraft, *practice_data]
+        return [*practice_data]
     except Exception as e:
         logger.error(f"Error retrieving aircraft data: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
