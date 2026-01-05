@@ -9,3 +9,4 @@ class TransformedAircraft(TypedDict, total=False):
     speed: Optional[str]
     direction: int
     details: Optional[str]
+    isExited: bool

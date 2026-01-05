@@ -23,26 +23,3 @@ class AircraftState(BaseModel):
     squawk: Optional[str] = Field(None, description="Transponder code")
     spi: bool = Field(..., description="Special purpose indicator")
     position_source: int = Field(..., description="Origin of position (0=ADS-B, 1=ASTERIX, 2=MLAT)")
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "icao24": "abc123",
-                "callsign": "FIN123",
-                "origin_country": "Finland",
-                "time_position": 1698765432,
-                "last_contact": 1698765432,
-                "longitude": 25.0,
-                "latitude": 60.0,
-                "baro_altitude": 10000.0,
-                "on_ground": False,
-                "velocity": 250.0,
-                "true_track": 180.0,
-                "vertical_rate": 0.0,
-                "sensors": None,
-                "geo_altitude": 10100.0,
-                "squawk": "1200",
-                "spi": False,
-                "position_source": 0,
-            }
-        }

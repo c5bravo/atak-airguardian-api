@@ -20,13 +20,13 @@ def fetch_practice_data() -> list[TransformedAircraft]:
             response = client.get(api_url)
 
             response.raise_for_status()
-            logger.info("✅ Successfully fetched data from Practice API")
+            logger.info("Successfully fetched data from Practice API")
             data: list[TransformedAircraft] = response.json()
             return data
 
     except httpx.HTTPError as e:
-        logger.error(f"❌ HTTP error occurred: {e}")
+        logger.error(f"HTTP error occurred: {e}")
         return []
     except Exception as e:
-        logger.error(f"❌ Unexpected error fetching Practice data: {e}")
+        logger.error(f"Unexpected error fetching Practice data: {e}")
         return []

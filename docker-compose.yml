@@ -9,7 +9,6 @@ services:
       - "8002:8002"
     volumes:
       - ./app:/app/app:ro
-      - ./certs:/app/certs:ro
     env_file:
       - .env.docker
     networks:
