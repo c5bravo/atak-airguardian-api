@@ -36,7 +36,7 @@ dummy_marine_data = [
         utc_seconds=45,
         ship_name="SUNNY STAR",
         ship_country="Marshall Is",
-        type="marine"
+        type="marine",
     )
 ]
 
