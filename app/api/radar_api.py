@@ -106,32 +106,40 @@ def filter_on_ground(aircraft: Dict[str, Any]) -> bool:
     # Only aircraft not on ground
     return not bool(aircraft.get("on_ground"))
 
+
 def transform_practice(aircraft_pc: Dict[str, Any]) -> TransformedAircraft:
-    return cast(TransformedAircraft, {
-        "id": 0,
-        "aircraftId": aircraft_pc.get("callsign"),
-        "position": aircraft_pc.get("position"),
-        "altitude": aircraft_pc.get("altitude"),
-        "speed": aircraft_pc.get("velocity"),
-        "direction": aircraft_pc.get("direction") or 0,
-        "details": aircraft_pc.get("details"),
-        "isExited": bool(aircraft_pc.get("isExited")),
-        "type": "practiceTool",
-    })
+    return cast(
+        TransformedAircraft,
+        {
+            "id": 0,
+            "aircraftId": aircraft_pc.get("callsign"),
+            "position": aircraft_pc.get("position"),
+            "altitude": aircraft_pc.get("altitude"),
+            "speed": aircraft_pc.get("velocity"),
+            "direction": aircraft_pc.get("direction") or 0,
+            "details": aircraft_pc.get("details"),
+            "isExited": bool(aircraft_pc.get("isExited")),
+            "type": "practiceTool",
+        },
+    )
 
 
 def transform_ship(ship: MarineTrafficPosition) -> TransformedAircraft:
-    return cast(TransformedAircraft, {
-        "id": 0,
-        "aircraftId": ship.ship_id,
-        "position": convert_to_mgrs(ship.lon, ship.lat),
-        "altitude": "surface",
-        "speed": "slow",
-        "direction": ship.heading or 0,
-        "details": f"Ship {ship.ship_name} from {ship.ship_country}",
-        "isExited": False,
-        "type": "marine",
-    })
+    return cast(
+        TransformedAircraft,
+        {
+            "id": 0,
+            "aircraftId": ship.ship_id,
+            "position": convert_to_mgrs(ship.lon, ship.lat),
+            "altitude": "surface",
+            "speed": "slow",
+            "direction": ship.heading or 0,
+            "details": f"Ship {ship.ship_name} from {ship.ship_country}",
+            "isExited": False,
+            "type": "marine",
+        },
+    )
+
 
 @router.get("/aircraft")
 def get_aircraft_data() -> List[TransformedAircraft]:
@@ -145,13 +153,13 @@ def get_aircraft_data() -> List[TransformedAircraft]:
         practice_data = fetch_practice_data()
 
         # Assume practice_data already transformed
-        transformed_practice = practice_data  
+        transformed_practice = practice_data
 
         # Transform marine ship data
         transformed_ships = [transform_ship(ship) for ship in marine_data]
 
         return [*transformed_practice, *transformed_ships]
-    
+
         # --- for useing OpenSky data switch add transformed_aircraft for return ---
         # return [*transformed_practice, *transformed_ships, *transformed_aircraft]
 

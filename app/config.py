@@ -40,6 +40,7 @@ class Settings(BaseSettings):
 
     marine_traffic_api_url: Optional[str] = None
 
+
 settings = Settings()
 
 
