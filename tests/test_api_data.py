@@ -26,16 +26,16 @@ dummy_aircraft_data: List[Dict[str, Any]] = [
 # Dummy marine traffic ship data
 dummy_marine_data = [
     MarineTrafficPosition(
-        SHIP_ID="713139",
-        LAT=37.38843,
-        LON=23.87123,
-        SPEED=6,
-        HEADING=104,
-        COURSE=41,
-        TIMESTAMP=datetime.now(timezone.utc),
-        UTC_SECONDS=45,
-        SHIPNAME="SUNNY STAR",
-        SHIP_COUNTRY="Marshall Is",
+        ship_id="713139",
+        lat=37.38843,
+        lon=23.87123,
+        speed=6,
+        heading=104,
+        course=41,
+        times_tamp=datetime.now(timezone.utc),
+        utc_seconds=45,
+        ship_name="SUNNY STAR",
+        ship_country="Marshall Is",
         type="marine"
     )
 ]

@@ -4,14 +4,14 @@ from datetime import datetime
 
 
 class MarineTrafficPosition(BaseModel):
-    SHIP_ID: str
-    LAT: float
-    LON: float
-    SPEED: Optional[float]
-    HEADING: Optional[int]
-    COURSE: Optional[int]
-    TIMESTAMP: Optional[datetime]
-    UTC_SECONDS: Optional[int]
-    SHIPNAME: Optional[str]
-    SHIP_COUNTRY: Optional[str]
+    ship_id: str
+    lat: float
+    lon: float
+    speed: Optional[float]
+    heading: Optional[int]
+    course: Optional[int]
+    times_tamp: Optional[datetime]
+    utc_seconds: Optional[int]
+    ship_name: Optional[str]
+    ship_country: Optional[str]
     type: Optional[str]
