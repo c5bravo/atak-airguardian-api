@@ -123,12 +123,12 @@ def transform_practice(aircraft_pc: Dict[str, Any]) -> TransformedAircraft:
 def transform_ship(ship: MarineTrafficPosition) -> TransformedAircraft:
     return cast(TransformedAircraft, {
         "id": 0,
-        "aircraftId": ship.SHIP_ID,
-        "position": convert_to_mgrs(ship.LON, ship.LAT),
+        "aircraftId": ship.ship_id,
+        "position": convert_to_mgrs(ship.lon, ship.lat),
         "altitude": "surface",
         "speed": "slow",
-        "direction": ship.HEADING or 0,
-        "details": f"Ship {ship.SHIPNAME} from {ship.SHIP_COUNTRY}",
+        "direction": ship.heading or 0,
+        "details": f"Ship {ship.ship_name} from {ship.ship_country}",
         "isExited": False,
         "type": "marine",
     })

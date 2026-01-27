@@ -2,7 +2,7 @@ import logging
 
 import httpx
 
-from app.config import settings
+#from app.config import settings
 from app.schemas.schema_marine_traffic import MarineTrafficPosition
 
 logging.basicConfig(level=logging.INFO)
@@ -10,9 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 def fetch_marine_traffic_data() -> list[MarineTrafficPosition]:
-    api_url = "https://api.kpler.com/v2/maritime/ais-latest?limit=3"
+    api_url = "http://localhost:3000/ships"
     headers = {
-        "Authorization": f"Bearer {settings.marine_traffic_api_url}",
+        "Authorization": "Bearer demo-marine-token",
         "Accept": "application/json"
     }
 
