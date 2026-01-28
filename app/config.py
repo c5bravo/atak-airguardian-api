@@ -41,6 +41,7 @@ class Settings(BaseSettings):
     marine_traffic_api_url: Optional[str] = None
     marine_traffic_key: Optional[str] = None
 
+
 settings = Settings()
 
 

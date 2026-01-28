@@ -11,7 +11,10 @@ logger = logging.getLogger(__name__)
 
 def fetch_marine_traffic_data() -> list[MarineTrafficPosition]:
     api_url = f"{settings.marine_traffic_api_url}"
-    headers = {"Authorization": f"Bearer {settings.marine_traffic_key}", "Accept": "application/json"}
+    headers = {
+        "Authorization": f"Bearer {settings.marine_traffic_key}",
+        "Accept": "application/json",
+    }
 
     try:
         with httpx.Client(timeout=10.0) as client:
