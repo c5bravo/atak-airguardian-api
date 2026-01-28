@@ -104,6 +104,6 @@ def test_get_aircraft_data(
     # ---- Ship assertions ----
     ship: Dict[str, Any] = data[1]
     assert ship["aircraftId"] == "713139"
-    assert ship["type"] == "marine"
+    assert ship["type"] == "marineTraffic"
     assert ship["speed"] == "slow"
     assert "SUNNY STAR" in ship["details"]

@@ -4,7 +4,7 @@ from typing import Literal, Optional
 import logging
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field, Extra
+from pydantic import BaseModel, Field
 from libpvarki.schemas.product import ProductDescription
 from app.config import read_ag_uri
 
@@ -38,7 +38,7 @@ class ProductDescriptionExtended(BaseModel):  # pylint: disable=too-few-public-m
     class Config:  # pylint: disable=too-few-public-methods
         """Pydantic configs"""
 
-        extra = Extra.forbid
+        extra = "forbid"
 
 
 @router.get(
