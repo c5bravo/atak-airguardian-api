@@ -108,36 +108,30 @@ def filter_on_ground(aircraft: Dict[str, Any]) -> bool:
 
 
 def transform_practice(aircraft_pc: Dict[str, Any]) -> TransformedAircraft:
-    return cast(
-        TransformedAircraft,
-        {
-            "id": 0,
-            "aircraftId": aircraft_pc.get("callsign"),
-            "position": aircraft_pc.get("position"),
-            "altitude": aircraft_pc.get("altitude"),
-            "speed": aircraft_pc.get("velocity"),
-            "direction": aircraft_pc.get("direction") or 0,
-            "details": aircraft_pc.get("details"),
-            "isExited": bool(aircraft_pc.get("isExited")),
-            "type": "practiceTool",
-        },
-    )
+    return {
+        "id": aircraft_pc.get("id", 0),
+        "aircraftId": aircraft_pc.get("aircraftId") or aircraft_pc.get("callsign"),
+        "position": aircraft_pc.get("position"),
+        "altitude": aircraft_pc.get("altitude"),
+        "speed": aircraft_pc.get("speed") or aircraft_pc.get("velocity"),
+        "direction": aircraft_pc.get("direction") or 0,
+        "details": aircraft_pc.get("details"),
+        "isExited": bool(aircraft_pc.get("isExited")),
+        "type": "practiceTool",
+    }
 
 
 def transform_ship(ship: MarineTrafficPosition) -> TransformedAircraft:
-    return cast(
-        TransformedAircraft,
-        {
-            "id": 0,
-            "aircraftId": ship.ship_id,
-            "position": convert_to_mgrs(ship.lon, ship.lat),
-            "altitude": "surface",
-            "speed": "slow",
-            "direction": ship.heading or 0,
-            "details": f"Ship {ship.ship_name} from {ship.ship_country}",
-            "isExited": False,
-            "type": "marine",
-        },
+    return TransformedAircraft(
+        id=0,
+        aircraftId=ship.ship_id,
+        position=convert_to_mgrs(ship.lon, ship.lat),
+        altitude="surface",
+        speed=classify_speed(ship.speed),
+        direction=int(ship.heading) if ship.heading else 0,
+        details=f"Ship {ship.shipname} from {ship.ship_country}",
+        isExited=False,
+        type="marineTraffic",
     )
 
 
@@ -150,10 +144,11 @@ def get_aircraft_data() -> List[TransformedAircraft]:
         # transformed_aircraft = [transform_aircraft(ac) for ac in filtered_data]
 
         marine_data = fetch_marine_traffic_data()
-        practice_data = fetch_practice_data()
+        raw_practice_data = fetch_practice_data()
 
-        # Assume practice_data already transformed
-        transformed_practice = practice_data
+        transformed_practice = [
+            transform_practice(cast(Dict[str, Any], ac)) for ac in raw_practice_data
+        ]
 
         # Transform marine ship data
         transformed_ships = [transform_ship(ship) for ship in marine_data]
