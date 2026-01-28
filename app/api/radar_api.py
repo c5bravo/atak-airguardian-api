@@ -9,7 +9,7 @@ from app.schemas.schema import TransformedAircraft
 from app.schemas.schema_marine_traffic import MarineTrafficPosition
 from app.tasks.practice_task import fetch_practice_data
 from app.tasks.marine_traffic_task import fetch_marine_traffic_data
-# from app.tasks.radar_task import fetch_aircraft_data
+from app.tasks.radar_task import fetch_aircraft_data
 
 logger = logging.getLogger(__name__)
 
@@ -138,10 +138,9 @@ def transform_ship(ship: MarineTrafficPosition) -> TransformedAircraft:
 @router.get("/aircraft")
 def get_aircraft_data() -> List[TransformedAircraft]:
     try:
-        # --- IF You want to use OpenSky data Remove comments ---
-        # data = fetch_aircraft_data()
-        # filtered_data = list(filter(filter_on_ground, data))
-        # transformed_aircraft = [transform_aircraft(ac) for ac in filtered_data]
+        data = fetch_aircraft_data()
+        filtered_data = list(filter(filter_on_ground, data))
+        transformed_aircraft = [transform_aircraft(ac) for ac in filtered_data]
 
         marine_data = fetch_marine_traffic_data()
         raw_practice_data = fetch_practice_data()
@@ -153,10 +152,7 @@ def get_aircraft_data() -> List[TransformedAircraft]:
         # Transform marine ship data
         transformed_ships = [transform_ship(ship) for ship in marine_data]
 
-        return [*transformed_practice, *transformed_ships]
-
-        # --- for useing OpenSky data switch add transformed_aircraft for return ---
-        # return [*transformed_practice, *transformed_ships, *transformed_aircraft]
+        return [*transformed_practice, *transformed_ships, *transformed_aircraft]
 
     except Exception as e:
         logger.error(f"Error retrieving aircraft data: {e}")
