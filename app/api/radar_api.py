@@ -11,7 +11,7 @@ from app.schemas.schema_fin_marine_traffic import ShipFeature
 from app.tasks.practice_task import fetch_practice_data
 from app.tasks.marine_traffic_task import fetch_marine_traffic_data
 from app.tasks.radar_task import fetch_aircraft_data
-from app.tasks.task_FinMarine_traffic import fetch_fin_marine_traffic_data
+from app.tasks.marine_FinTraffic_task import fetch_fin_marine_traffic_data
 
 logger = logging.getLogger(__name__)
 
@@ -151,7 +151,7 @@ def transform_finTraffic_ship(feature: ShipFeature) -> TransformedAircraft:
         "direction": int(props.heading),
         "details": f"MMSI: {feature.mmsi} | Status: {props.navStat}",
         "isExited": False,
-        "type": "FinTrafficMarine",
+        "type": "marineFinTraffic",
     }
 
 
