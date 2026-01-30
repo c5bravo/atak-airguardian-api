@@ -1,109 +1,92 @@
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
-from datetime import datetime
-
 from app.main import app
-from app.schemas.schema_marine_traffic import MarineTrafficPosition
+from app.schemas.schema_marine_traffic import ShipFeature, Geometry, ShipProperties
 
 client = TestClient(app)
 
-# Dummy practice aircraft data
-dummy_aircraft_data: List[Dict[str, Any]] = [
+
+def create_dummy_ship_feature() -> ShipFeature:
+    return ShipFeature(
+        mmsi=219598000,
+        type="Feature",
+        geometry=Geometry(
+            type="Point",
+            coordinates=[24.9667, 60.1666],  # [Lon, Lat]
+        ),
+        properties=ShipProperties(
+            mmsi=219598000,
+            sog=15.5,
+            cog=346.5,
+            navStat=1,
+            rot=4,
+            posAcc=True,
+            raim=True,
+            heading=79,
+            timestamp=59,
+            timestampExternal=1659212938646,
+        ),
+    )
+
+
+dummy_practice_data: List[Dict[str, Any]] = [
     {
-        "id": 0,
-        "aircraftId": "FIN321",
+        "id": 1,
+        "aircraftId": "TEST-PRACTICE",
         "position": "35VMS12",
-        "altitude": "surface",
-        "speed": "fast",
+        "altitude": "low",
+        "speed": "slow",
         "direction": 90,
-        "details": "4 Jet",
+        "details": "Practice Data",
         "isExited": False,
         "type": "practiceTool",
     }
 ]
 
-# Dummy marine traffic ship data
-dummy_marine_data = [
-    MarineTrafficPosition(
-        MMSI="538003913",
-        IMO="9470959",
-        SHIP_ID="713139",
-        LAT=60.1666,
-        LON=24.9667,
-        SPEED=12.5,
-        HEADING=104,
-        COURSE=41,
-        STATUS="0",
-        TIMESTAMP=datetime.now(),
-        DSRC="TER",
-        UTC_SECONDS=45,
-        MARKET="SUPPORTING VESSELS",
-        SHIPNAME="SUNNY STAR",
-        SHIPTYPE="89",
-        CALLSIGN="V7TZ6",
-        FLAG="MH",
-        LENGTH=184,
-        WIDTH=27.43,
-        GRT=23313,
-        DWT=37857,
-        DRAUGHT=95,
-        YEAR_BUILT="2010",
-        SHIP_COUNTRY="Marshall Is",
-        SHIP_CLASS="HANDYSIZE",
-        ROT=0,
-        TYPE_NAME="Oil/Chemical Tanker",
-        AIS_TYPE_SUMMARY="Tanker",
-        DESTINATION="HELSINKI",
-        L_FORE=5,
-        W_LEFT=5,
-        CURRENT_PORT="HELSINKI",
-        LAST_PORT="AGIOI THEODOROI",
-        CURRENT_PORT_ID="101",
-        CURRENT_PORT_UNLOCODE="FIHEL",
-        CURRENT_PORT_COUNTRY="FI",
-        LAST_PORT_ID="29",
-        LAST_PORT_UNLOCODE="GRAGT",
-        LAST_PORT_COUNTRY="GR",
-        NEXT_PORT_ID="",
-        NEXT_PORT_UNLOCODE="",
-        NEXT_PORT_NAME="",
-        NEXT_PORT_COUNTRY="",
-        DISTANCE_TO_GO=0,
-        DISTANCE_TRAVELLED=74,
-        AVG_SPEED=12.6,
-        MAX_SPEED=13.2,
-        ETA=None,
-        LAST_PORT_TIME=None,
-        ETA_CALC=None,
-        ETA_UPDATED=None,
-    )
+dummy_opensky_data: List[Dict[str, Any]] = [
+    {
+        "callsign": "FIN123",
+        "longitude": 24.0,
+        "latitude": 60.0,
+        "baro_altitude": 5000,
+        "velocity": 200,
+        "true_track": 180,
+        "on_ground": False,
+        "origin_country": "Finland",
+        "isExited": False,
+    }
 ]
 
 
-@patch("app.api.radar_api.fetch_marine_traffic_data")
+@patch("app.api.radar_api.fetch_fin_marine_traffic_data")
 @patch("app.api.radar_api.fetch_practice_data")
-def test_get_aircraft_data(
+@patch("app.api.radar_api.fetch_aircraft_data")
+def test_get_aircraft_data_combined(
+    mock_fetch_opensky: MagicMock,
     mock_fetch_practice: MagicMock,
-    mock_fetch_marine: MagicMock,
+    mock_fetch_fin_marine: MagicMock,
 ) -> None:
-    mock_fetch_practice.return_value = dummy_aircraft_data
-    mock_fetch_marine.return_value = dummy_marine_data
+    mock_fetch_practice.return_value = dummy_practice_data
+    mock_fetch_opensky.return_value = dummy_opensky_data
+    mock_fetch_fin_marine.return_value = [create_dummy_ship_feature()]
 
     response = client.get("/radar/aircraft")
+
     assert response.status_code == 200
-
     data: List[Dict[str, Any]] = response.json()
-    assert len(data) == 2
 
-    # ---- Aircraft assertions ----
-    aircraft: Dict[str, Any] = data[0]
-    assert aircraft["aircraftId"] == "FIN321"
-    assert aircraft["type"] == "practiceTool"
+    assert len(data) == 3
 
-    # ---- Ship assertions ----
-    ship: Dict[str, Any] = data[1]
-    assert ship["aircraftId"] == "713139"
-    assert ship["type"] == "marineTraffic"
+    practice = next(item for item in data if item["type"] == "practiceTool")
+    assert practice["aircraftId"] == "TEST-PRACTICE"
+
+    aircraft = next(item for item in data if item["type"] == "openSky")
+    assert aircraft["aircraftId"] == "FIN123"
+    assert aircraft["altitude"] == "high"
+
+    ship = next(item for item in data if item["type"] == "marineTraffic")
+    assert ship["aircraftId"] == "219598000"
+    assert ship["altitude"] == "surface"
     assert ship["speed"] == "slow"
-    assert "SUNNY STAR" in ship["details"]
+    assert "MMSI: 219598000" in ship["details"]
