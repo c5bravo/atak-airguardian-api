@@ -137,7 +137,7 @@ def transform_ship(ship: MarineTrafficPosition) -> TransformedAircraft:
     )
 
 
-def transform_geojson_ship(feature: ShipFeature) -> TransformedAircraft:
+def transform_finTraffic_ship(feature: ShipFeature) -> TransformedAircraft:
     coords = feature.geometry.coordinates
     props = feature.properties
 
@@ -176,7 +176,7 @@ def get_aircraft_data() -> List[TransformedAircraft]:
         transformed_ships = [transform_ship(ship) for ship in marine_data]
 
         # Transform FinMarine data
-        transformed_FinMarine = [transform_geojson_ship(ship) for ship in raw_fin_marine_data]
+        transformed_FinMarine = [transform_finTraffic_ship(ship) for ship in raw_fin_marine_data]
 
         return [
             *transformed_practice,
