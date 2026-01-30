@@ -6,12 +6,10 @@ import mgrs  # type: ignore
 from fastapi import APIRouter, HTTPException
 
 from app.schemas.schema import TransformedAircraft
-from app.schemas.schema_marine_traffic import MarineTrafficPosition
-from app.schemas.schema_fin_marine_traffic import ShipFeature
+from app.schemas.schema_marine_traffic import ShipFeature
 from app.tasks.practice_task import fetch_practice_data
-from app.tasks.marine_traffic_task import fetch_marine_traffic_data
 from app.tasks.radar_task import fetch_aircraft_data
-from app.tasks.marine_FinTraffic_task import fetch_fin_marine_traffic_data
+from app.tasks.marine_traffic_task import fetch_fin_marine_traffic_data
 
 logger = logging.getLogger(__name__)
 
@@ -123,20 +121,6 @@ def transform_practice(aircraft_pc: Dict[str, Any]) -> TransformedAircraft:
     }
 
 
-def transform_ship(ship: MarineTrafficPosition) -> TransformedAircraft:
-    return TransformedAircraft(
-        id=0,
-        aircraftId=ship.ship_id,
-        position=convert_to_mgrs(ship.lon, ship.lat),
-        altitude="surface",
-        speed=classify_speed(ship.speed),
-        direction=int(ship.heading) if ship.heading else 0,
-        details=f"Ship {ship.shipname} from {ship.ship_country}",
-        isExited=False,
-        type="marineTraffic",
-    )
-
-
 def transform_finTraffic_ship(feature: ShipFeature) -> TransformedAircraft:
     coords = feature.geometry.coordinates
     props = feature.properties
@@ -151,7 +135,7 @@ def transform_finTraffic_ship(feature: ShipFeature) -> TransformedAircraft:
         "direction": int(props.heading),
         "details": f"MMSI: {feature.mmsi} | Status: {props.navStat}",
         "isExited": False,
-        "type": "marineFinTraffic",
+        "type": "marineTraffic",
     }
 
 
@@ -159,7 +143,6 @@ def transform_finTraffic_ship(feature: ShipFeature) -> TransformedAircraft:
 def get_aircraft_data() -> List[TransformedAircraft]:
     try:
         data = fetch_aircraft_data()
-        marine_data = fetch_marine_traffic_data()
         raw_practice_data = fetch_practice_data()
         raw_fin_marine_data = fetch_fin_marine_traffic_data()
 
@@ -172,15 +155,11 @@ def get_aircraft_data() -> List[TransformedAircraft]:
             transform_practice(cast(Dict[str, Any], ac)) for ac in raw_practice_data
         ]
 
-        # Transform marine ship data
-        transformed_ships = [transform_ship(ship) for ship in marine_data]
-
         # Transform FinMarine data
         transformed_FinMarine = [transform_finTraffic_ship(ship) for ship in raw_fin_marine_data]
 
         return [
             *transformed_practice,
-            *transformed_ships,
             *transformed_aircraft,
             *transformed_FinMarine,
         ]
