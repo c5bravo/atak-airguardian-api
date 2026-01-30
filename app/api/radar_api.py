@@ -7,9 +7,11 @@ from fastapi import APIRouter, HTTPException
 
 from app.schemas.schema import TransformedAircraft
 from app.schemas.schema_marine_traffic import MarineTrafficPosition
+from app.schemas.schema_fin_marine_traffic import ShipFeature
 from app.tasks.practice_task import fetch_practice_data
 from app.tasks.marine_traffic_task import fetch_marine_traffic_data
 from app.tasks.radar_task import fetch_aircraft_data
+from app.tasks.task_FinMarine_traffic import fetch_fin_marine_traffic_data
 
 logger = logging.getLogger(__name__)
 
@@ -135,16 +137,37 @@ def transform_ship(ship: MarineTrafficPosition) -> TransformedAircraft:
     )
 
 
+def transform_geojson_ship(feature: ShipFeature) -> TransformedAircraft:
+    coords = feature.geometry.coordinates
+    props = feature.properties
+
+    return {
+        "id": 0,
+        "aircraftId": str(feature.mmsi),
+        # coordinates[0] is Longitude, coordinates[1] is Latitude
+        "position": convert_to_mgrs(coords[0], coords[1]),
+        "altitude": "surface",
+        "speed": classify_speed(props.sog),
+        "direction": int(props.heading),
+        "details": f"MMSI: {feature.mmsi} | Status: {props.navStat}",
+        "isExited": False,
+        "type": "FinTrafficMarine",
+    }
+
+
 @router.get("/aircraft")
 def get_aircraft_data() -> List[TransformedAircraft]:
     try:
         data = fetch_aircraft_data()
+        marine_data = fetch_marine_traffic_data()
+        raw_practice_data = fetch_practice_data()
+        raw_fin_marine_data = fetch_fin_marine_traffic_data()
+
+        # Transform OpenSky data
         filtered_data = list(filter(filter_on_ground, data))
         transformed_aircraft = [transform_aircraft(ac) for ac in filtered_data]
 
-        marine_data = fetch_marine_traffic_data()
-        raw_practice_data = fetch_practice_data()
-
+        # Transform PracticeTool data
         transformed_practice = [
             transform_practice(cast(Dict[str, Any], ac)) for ac in raw_practice_data
         ]
@@ -152,7 +175,15 @@ def get_aircraft_data() -> List[TransformedAircraft]:
         # Transform marine ship data
         transformed_ships = [transform_ship(ship) for ship in marine_data]
 
-        return [*transformed_practice, *transformed_ships, *transformed_aircraft]
+        # Transform FinMarine data
+        transformed_FinMarine = [transform_geojson_ship(ship) for ship in raw_fin_marine_data]
+
+        return [
+            *transformed_practice,
+            *transformed_ships,
+            *transformed_aircraft,
+            *transformed_FinMarine,
+        ]
 
     except Exception as e:
         logger.error(f"Error retrieving aircraft data: {e}")
