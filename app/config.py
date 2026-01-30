@@ -38,9 +38,6 @@ class Settings(BaseSettings):
     practool_host: Optional[str] = None
     practool_port: Optional[int] = None
 
-    marine_traffic_api_url: Optional[str] = None
-    marine_traffic_key: Optional[str] = None
-
     fin_marine_traffic_api_url: Optional[str] = None
 
 
