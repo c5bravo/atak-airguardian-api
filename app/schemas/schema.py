@@ -10,3 +10,4 @@ class TransformedAircraft(TypedDict, total=False):
     direction: int
     details: Optional[str]
     isExited: bool
+    type: Optional[str]
