@@ -25,6 +25,8 @@ class Settings(BaseSettings):
     opensky_client_id_3: Optional[str] = None
     opensky_client_secret_3: Optional[str] = None
 
+    fin_marine_traffic_api_url: Optional[str] = None
+
     # Finland Bounding Box
     lat_min: float = 59.5
     lat_max: float = 70.0
@@ -34,11 +36,6 @@ class Settings(BaseSettings):
     # API Server Configuration
     api_host: str = "0.0.0.0"  # nosec
     api_port: int = 8010
-
-    practool_host: Optional[str] = None
-    practool_port: Optional[int] = None
-
-    fin_marine_traffic_api_url: Optional[str] = None
 
 
 settings = Settings()
