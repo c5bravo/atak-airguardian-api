@@ -1,4 +1,4 @@
-# ATAK AirGuardian Proxy
+# ATAK Air&Marine Proxy
 
 A secure REST API that tracks aircraft in real-time using Practice tool API and OpenSky Network data.
 
