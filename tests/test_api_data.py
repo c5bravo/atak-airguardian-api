@@ -28,6 +28,8 @@ def create_dummy_ship_feature() -> ShipFeature:
             timestampExternal=1659212938646,
         ),
     )
+
+
 dummy_opensky_data: List[Dict[str, Any]] = [
     {
         "callsign": "FIN123",
@@ -41,6 +43,8 @@ dummy_opensky_data: List[Dict[str, Any]] = [
         "isExited": False,
     }
 ]
+
+
 @patch("app.api.radar_api.fetch_fin_marine_traffic_data")
 @patch("app.api.radar_api.fetch_aircraft_data")
 def test_get_aircraft_data_combined(

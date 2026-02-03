@@ -12,7 +12,7 @@ class Geometry(BaseModel):
 class ShipProperties(BaseModel):
     mmsi: int
     sog: Optional[float] = None  # Speed Over Ground
-    cog: Optional[float] = None # Course Over Ground
+    cog: Optional[float] = None  # Course Over Ground
     navStat: int
     rot: Optional[int] = None  # Rate of Turn
     posAcc: bool
