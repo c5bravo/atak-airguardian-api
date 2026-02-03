@@ -120,7 +120,7 @@ def transform_finTraffic_ship(feature: ShipFeature) -> TransformedAircraft:
         "aircraftId": str(feature.mmsi),
         "position": convert_to_mgrs(lon, lat),
         "altitude": "surface",
-        "speed": str(props.sog),
+        "speed": classify_speed(props.sog),
         "direction": direction_val,
         "details": f"MMSI: {feature.mmsi} | Status: {props.navStat}",
         "isExited": False,
