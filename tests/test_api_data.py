@@ -64,5 +64,5 @@ def test_get_aircraft_data_combined(
 
     ship = next(item for item in data if item["type"] == "marineTraffic")
     assert ship["aircraftId"] == "219598000"
-    assert ship["speed"] == 15.5
+    assert ship["speed"] == "slow"
     assert "MMSI: 219598000" in ship["details"]
