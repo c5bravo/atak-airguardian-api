@@ -1,13 +1,12 @@
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional
 
 import mgrs  # type: ignore
 from fastapi import APIRouter, HTTPException
 
 from app.schemas.schema import TransformedAircraft
 from app.schemas.schema_marine_traffic import ShipFeature
-from app.tasks.practice_task import fetch_practice_data
 from app.tasks.radar_task import fetch_aircraft_data
 from app.tasks.marine_traffic_task import fetch_fin_marine_traffic_data
 
@@ -107,32 +106,22 @@ def filter_on_ground(aircraft: Dict[str, Any]) -> bool:
     return not bool(aircraft.get("on_ground"))
 
 
-def transform_practice(aircraft_pc: Dict[str, Any]) -> TransformedAircraft:
-    return {
-        "id": aircraft_pc.get("id", 0),
-        "aircraftId": aircraft_pc.get("aircraftId") or aircraft_pc.get("callsign"),
-        "position": aircraft_pc.get("position"),
-        "altitude": aircraft_pc.get("altitude"),
-        "speed": aircraft_pc.get("speed") or aircraft_pc.get("velocity"),
-        "direction": aircraft_pc.get("direction") or 0,
-        "details": aircraft_pc.get("details"),
-        "isExited": bool(aircraft_pc.get("isExited")),
-        "type": "practiceTool",
-    }
-
-
 def transform_finTraffic_ship(feature: ShipFeature) -> TransformedAircraft:
     coords = feature.geometry.coordinates
     props = feature.properties
 
+    lon = coords[0] if len(coords) > 0 else None
+    lat = coords[1] if len(coords) > 1 else None
+
+    direction_val: int = int(props.heading) if props.heading is not None else 0
+
     return {
-        "id": 0,
+        "id": feature.mmsi,
         "aircraftId": str(feature.mmsi),
-        # coordinates[0] is Longitude, coordinates[1] is Latitude
-        "position": convert_to_mgrs(coords[0], coords[1]),
+        "position": convert_to_mgrs(lon, lat),
         "altitude": "surface",
-        "speed": classify_speed(props.sog),
-        "direction": int(props.heading),
+        "speed": str(props.sog),
+        "direction": direction_val,
         "details": f"MMSI: {feature.mmsi} | Status: {props.navStat}",
         "isExited": False,
         "type": "marineTraffic",
@@ -143,23 +132,16 @@ def transform_finTraffic_ship(feature: ShipFeature) -> TransformedAircraft:
 def get_aircraft_data() -> List[TransformedAircraft]:
     try:
         data = fetch_aircraft_data()
-        raw_practice_data = fetch_practice_data()
         raw_fin_marine_data = fetch_fin_marine_traffic_data()
 
         # Transform OpenSky data
         filtered_data = list(filter(filter_on_ground, data))
         transformed_aircraft = [transform_aircraft(ac) for ac in filtered_data]
 
-        # Transform PracticeTool data
-        transformed_practice = [
-            transform_practice(cast(Dict[str, Any], ac)) for ac in raw_practice_data
-        ]
-
         # Transform FinMarine data
         transformed_FinMarine = [transform_finTraffic_ship(ship) for ship in raw_fin_marine_data]
 
         return [
-            *transformed_practice,
             *transformed_aircraft,
             *transformed_FinMarine,
         ]
