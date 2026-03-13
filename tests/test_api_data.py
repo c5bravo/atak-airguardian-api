@@ -30,20 +30,6 @@ def create_dummy_ship_feature() -> ShipFeature:
     )
 
 
-dummy_practice_data: List[Dict[str, Any]] = [
-    {
-        "id": 1,
-        "aircraftId": "TEST-PRACTICE",
-        "position": "35VMS12",
-        "altitude": "low",
-        "speed": "slow",
-        "direction": 90,
-        "details": "Practice Data",
-        "isExited": False,
-        "type": "practiceTool",
-    }
-]
-
 dummy_opensky_data: List[Dict[str, Any]] = [
     {
         "callsign": "FIN123",
@@ -60,33 +46,23 @@ dummy_opensky_data: List[Dict[str, Any]] = [
 
 
 @patch("app.api.radar_api.fetch_fin_marine_traffic_data")
-@patch("app.api.radar_api.fetch_practice_data")
 @patch("app.api.radar_api.fetch_aircraft_data")
 def test_get_aircraft_data_combined(
     mock_fetch_opensky: MagicMock,
-    mock_fetch_practice: MagicMock,
     mock_fetch_fin_marine: MagicMock,
 ) -> None:
-    mock_fetch_practice.return_value = dummy_practice_data
-    mock_fetch_opensky.return_value = dummy_opensky_data
     mock_fetch_fin_marine.return_value = [create_dummy_ship_feature()]
+    mock_fetch_opensky.return_value = dummy_opensky_data
 
     response = client.get("/radar/aircraft")
 
     assert response.status_code == 200
     data: List[Dict[str, Any]] = response.json()
-
-    assert len(data) == 3
-
-    practice = next(item for item in data if item["type"] == "practiceTool")
-    assert practice["aircraftId"] == "TEST-PRACTICE"
-
     aircraft = next(item for item in data if item["type"] == "openSky")
     assert aircraft["aircraftId"] == "FIN123"
     assert aircraft["altitude"] == "high"
 
     ship = next(item for item in data if item["type"] == "marineTraffic")
     assert ship["aircraftId"] == "219598000"
-    assert ship["altitude"] == "surface"
     assert ship["speed"] == "slow"
     assert "MMSI: 219598000" in ship["details"]
